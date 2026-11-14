@@ -130,7 +130,7 @@
 
   <figure>
     <div class="screen"><canvas id="hero" width="108" height="54" class="px"></canvas></div>
-    <figcaption style="display:flex;justify-content:space-between;gap:12px"><span><b>FIG. 1</b> &nbsp;Page 1 of TERRAIN, as the Digitone draws it.</span><a class="go" href="#test">test it here! ↓</a></figcaption>
+    <figcaption style="display:flex;justify-content:space-between;gap:12px"><span><b>FIG. 1</b> &nbsp;<span id="figname">Page 1 of TERRAIN, as the Digitone draws it.</span></span><a class="go" href="#test">test it here! ↓</a></figcaption>
   </figure>
 
   <h2><span>01</span>What's in it</h2>
@@ -390,12 +390,42 @@ async function playable() {
 // ---------- FIG. 1: the page by itself, slowly wandering through the first bank ----------
 async function hero() {
   await T.loadLands("img/lands.bin");
-  const c = $("hero"), x = c.getContext("2d"), img = x.createImageData(128, 64), G = new Uint8Array(128 * 64);
+  const c = $("hero"), x = c.getContext("2d");
+  // the boot first, like the machine: GLITCH, RITO and FOURIER take turns from one visit to the next
+  const NAMES = ["GLITCH", "RITO", "FOURIER"];
+  let turn = Math.floor(Math.random() * 3);
+  try { const k = +(localStorage.getItem("terrain-boot") ?? -1); turn = (k + 1) % 3; localStorage.setItem("terrain-boot", turn); } catch (e) {}
+  $("figname").textContent = "The " + NAMES[turn] + " boot, then page 1 of TERRAIN, as the Digitone draws them.";
+  try {
+    const buf = new Uint8Array(await (await fetch("img/boot.bin")).arrayBuffer());
+    let p = 4; const frames = [];
+    for (let v = 0; v < 3; v++) {
+      const n = buf[p] | (buf[p + 1] << 8); p += 2;
+      const list = [];
+      for (let i = 0; i < n; i++) { const len = buf[p] | (buf[p + 1] << 8); p += 2; list.push(buf.subarray(p, p + len)); p += len; }
+      if (v === turn) frames.push(...list);
+    }
+    if (!still && frames.length) {
+      c.width = 128; c.height = 64;
+      const img = x.createImageData(128, 64), cur = new Uint8Array(8192);
+      for (const f of frames) {
+        let q = 0, bit = 0, i = 0;
+        while (q < f.length) { let r = 0, sh = 0, b; do { b = f[q++]; r |= (b & 127) << sh; sh += 7; } while (b & 128); if (bit) for (let k = 0; k < r; k++) cur[i + k] ^= 1; i += r; bit ^= 1; }
+        for (let k = 0; k < 8192; k++) { const o = k * 4, on = cur[k]; img.data[o] = on ? 236 : 0; img.data[o + 1] = on ? 236 : 0; img.data[o + 2] = on ? 230 : 0; img.data[o + 3] = 255; }
+        x.putImageData(img, 0, 0);
+        await new Promise((r) => setTimeout(r, 40));
+      }
+      await new Promise((r) => setTimeout(r, 700));
+    }
+  } catch (e) {}
+  c.width = 108; c.height = 54;
+  const img = x.createImageData(128, 64), G = new Uint8Array(128 * 64);
   const vals = {}; for (const k of T.KNOBS) vals[k.id] = k.def;
+  vals.tuny = 0x4000 + 12 * 256; vals.zoom = 0x4800;
   let t = 0;
   function frame() {
     t += 1;
-    vals.terr = Math.round(((Math.sin(t / 900) + 1) / 2) * 0x7f00);
+    vals.terr = Math.round(((Math.sin(t / 900 - 1.57) + 1) / 2) * 0x7f00);
     vals.posx = 0x4000 + Math.round(Math.sin(t / 260) * 0x1800);
     vals.posy = 0x4000 + Math.round(Math.cos(t / 330) * 0x1400);
     vals.phsy = 0x4000 + Math.round(Math.sin(t / 500) * 0x2000);
