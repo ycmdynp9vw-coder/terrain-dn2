@@ -117,12 +117,12 @@
 
   <h2><span>01</span>What's in it</h2>
   <dl class="feat">
-    <div><dt>TERRAIN</dt><dd>Wave terrain synthesis. 8 banks of 8 lands, warp, an FM-style MOD, phase distortion, land shaping (aspect, rotation, erosion, ridge, wind, feedback), a drum page with pitch sweep and filtered noise, sync and key tracking. In the machine list right below SWARMER.</dd></div>
-    <div><dt>Pages</dt><dd>Five of them, drawn to sit next to the stock machines. Press an encoder to read the exact value.</dd></div>
-    <div><dt>Negative screen</dt><dd>SETTINGS › PERSONALIZE. The whole display inverted; p-locks still read the right way round.</dd></div>
-    <div><dt>Mod graphics</dt><dd>SETTINGS › PERSONALIZE. TERRAIN's drawings glide to the new value when you turn, randomise or FUNC + turn.</dd></div>
-    <div><dt>Boot</dt><dd>Three intros, one after the other at each power-on: GLITCH, RITO, FOURIER.</dd></div>
-    <div><dt>From dnfw</dt><dd>Ported from <a href="https://github.com/angellinares/dn2_firmware_explore">dn2_firmware_explore</a>: more LFO destinations, LFO ONE/HALF that hold their value, arpeggiator on MIDI tracks, SHUF and RAND arp modes, arp offsets in scale, MIDI out of audio tracks, reload confirm.</dd></div>
+    <div><dt>TERRAIN</dt><dd>Wave terrain synthesis. A point runs over a surface and the height under it is the sound. 64 terrains in 8 banks, with warp, FM-style mod, phase distortion, a drum page and sync. It sits right under SWARMER in the machine list.</dd></div>
+    <div><dt>Pages</dt><dd>Five of them, made to look like the stock ones. Push an encoder to see its value.</dd></div>
+    <div><dt>Negative screen</dt><dd>Flips the whole screen. It's in SETTINGS › PERSONALIZE. P-locks still show the right way round.</dd></div>
+    <div><dt>Mod graphics</dt><dd>Also in PERSONALIZE. TERRAIN's drawings slide to the new value instead of jumping.</dd></div>
+    <div><dt>Boot</dt><dd>Three intros that take turns every time you switch on: GLITCH, RITO, FOURIER.</dd></div>
+    <div><dt>From dnfw</dt><dd>The mods I wanted from <a href="https://github.com/angellinares/dn2_firmware_explore">dn2_firmware_explore</a>: more LFO destinations, LFO ONE/HALF that hold, arp on MIDI tracks, SHUF and RAND arp modes, arp offsets in scale, MIDI out from audio tracks, reload confirm.</dd></div>
   </dl>
 
   <figure>
@@ -139,52 +139,52 @@
   <p class="hint" style="margin-top:28px">Drag the knobs and the cursor. Play the keys, or <code>A</code>–<code>K</code> on your keyboard.</p>
 
   <h2 id="params"><span>03</span>The parameters</h2>
-  <p>Five pages of eight knobs. On the Digitone, press an encoder to read its exact value.</p>
-  <h3>SYN 1 &nbsp;·&nbsp; the land and the point</h3>
+  <p>Five pages, eight knobs each. On the Digitone you can push an encoder to see the exact number.</p>
+  <h3>SYN 1 &nbsp;·&nbsp; the map</h3>
   <dl class="feat">
-    <div><dt>TUNE</dt><dd>Pitch of the whole machine, in semitones. The point runs one lap of its path for every period of the note you play.</dd></div>
-    <div><dt>BANK</dt><dd>Picks one of eight families of lands: CLSC classic shapes, HARM harmonic (organ-like), EDGE sharp edges and steps, CHAO chaotic and noisy, FM frequency-modulation surfaces, FOLD wavefolders, BITS digital and stepped, CHEB Chebyshev curves (clean harmonic series).</dd></div>
-    <div><dt>TERR</dt><dd>Picks the land inside the bank and morphs smoothly from one to the next. Its name is shown top right on the map, the bank top left.</dd></div>
-    <div><dt>WARP</dt><dd>Folds the height back on itself through a sine wave. A little adds harmonics; a lot makes it hard and metallic.</dd></div>
-    <div><dt>POSX / POSY</dt><dd>Where the path sits on the land: the cross on the map. Moving it changes the timbre, like a wavetable position but in two directions.</dd></div>
-    <div><dt>ZOOM</dt><dd>Size of the path. Small: the point stays on one slope and the sound is simple, close to a sine wave. Large: it crosses many hills and the sound gets rich and bright.</dd></div>
-    <div><dt>MOD</dt><dd>The Y wave pushes the phase of X, like FM between the two axes. The path bends into knots and the tone grows sidebands.</dd></div>
+    <div><dt>TUNE</dt><dd>The pitch, in semitones. Same as TUNE on any other machine.</dd></div>
+    <div><dt>BANK</dt><dd>Eight sets of terrains. CLSC is the plain stuff, HARM sounds like organs, EDGE has steps and corners, CHAO is the messy one, FM is FM, FOLD folds, BITS is digital dirt, CHEB is all clean harmonics.</dd></div>
+    <div><dt>TERR</dt><dd>Picks a terrain inside the bank. It doesn't jump, it fades into the next one, so you can sweep it with an LFO. The name shows up top right.</dd></div>
+    <div><dt>WARP</dt><dd>Folds the sound back over itself. Turn it up slowly, it goes from warm to metal pretty fast.</dd></div>
+    <div><dt>POSX / POSY</dt><dd>Moves the cross around the map, and the whole path with it. Grab this one first: same terrain, different spot, different sound.</dd></div>
+    <div><dt>ZOOM</dt><dd>How big the path is. Small and the point barely moves, so you get something close to a sine wave. Big and it runs over the hills and gets bright.</dd></div>
+    <div><dt>MOD</dt><dd>Lets Y push X around, a bit like FM. The path ties itself in knots.</dd></div>
   </dl>
   <h3>SYN 2 &nbsp;·&nbsp; the two axes</h3>
   <dl class="feat">
-    <div><dt>TUNX / TUNY</dt><dd>Pitch of each axis against the note, in semitones. The same pitch draws a line or an ellipse; an octave apart a figure of eight; other intervals give inharmonic, bell-like tones.</dd></div>
-    <div><dt>WAVX / WAVY</dt><dd>The wave that moves the point along that axis: SIN glides, TRI goes in straight lines, SQR jumps between two places, SAW sweeps one way and snaps back.</dd></div>
-    <div><dt>PHSX / PHSY</dt><dd>Phase offset of each axis. With equal tunes it opens a line into an ellipse or a circle, so the point reads a different part of the land.</dd></div>
-    <div><dt>PDX / PDY</dt><dd>Phase distortion, Casio CZ style: squeezes the wave towards one side (the sign chooses which). Brighter, with a resonant edge as you turn it.</dd></div>
+    <div><dt>TUNX / TUNY</dt><dd>Each axis has its own tuning against the note. Same pitch on both gives a line or a circle, an octave apart gives a figure eight. Anything else gets clangy and bell-like, which is half the fun.</dd></div>
+    <div><dt>WAVX / WAVY</dt><dd>The wave that pushes the point along that axis. SIN is smooth, TRI goes straight, SQR jumps between two spots, SAW goes one way and snaps back.</dd></div>
+    <div><dt>PHSX / PHSY</dt><dd>Shifts one axis against the other. With the same tuning on both, this is what opens a line into a circle.</dd></div>
+    <div><dt>PDX / PDY</dt><dd>Phase distortion, the old Casio CZ trick. Bends the wave to one side or the other depending on which way you turn. Brighter, a bit resonant.</dd></div>
   </dl>
-  <h3>SYN 3 &nbsp;·&nbsp; shaping the land</h3>
+  <h3>SYN 3 &nbsp;·&nbsp; the land</h3>
   <dl class="feat">
-    <div><dt>ASPT</dt><dd>Aspect: makes the path wider in X (turn left) or in Y (turn right).</dd></div>
-    <div><dt>ROTA</dt><dd>Rotates the path on the land, from half a turn back to half a turn forward.</dd></div>
-    <div><dt>GRAN</dt><dd>The point jumps from cell to cell instead of gliding. Stepped, lo-fi, bit-crushed tones.</dd></div>
-    <div><dt>CURV</dt><dd>Bends the path towards its edges: positive pushes it out onto the hills, negative pulls it in.</dd></div>
-    <div><dt>ERSN</dt><dd>Erosion: smooths the height that comes out of the land. Darker and softer.</dd></div>
-    <div><dt>RIDG</dt><dd>Ridge: folds the tops into sharp ridges. Brighter, more edges.</dd></div>
-    <div><dt>WIND</dt><dd>Wind: the centre of the path drifts slowly across the land on its own. Movement without an LFO.</dd></div>
-    <div><dt>FDBK</dt><dd>Feedback: the height is sent back into X. From a bit of grit to chaos and noise.</dd></div>
+    <div><dt>ASPT</dt><dd>Stretches the path wider or taller. Left for X, right for Y.</dd></div>
+    <div><dt>ROTA</dt><dd>Turns the path around on the map.</dd></div>
+    <div><dt>GRAN</dt><dd>Instead of gliding, the point hops from square to square. Lo-fi and steppy.</dd></div>
+    <div><dt>CURV</dt><dd>Bends the path near the edges. Positive throws it out onto the hills, negative pulls it back to the middle.</dd></div>
+    <div><dt>ERSN</dt><dd>Erosion. Sands the terrain down, so it gets darker and softer.</dd></div>
+    <div><dt>RIDG</dt><dd>Ridges. Sharpens the tops, more edge and fizz.</dd></div>
+    <div><dt>WIND</dt><dd>The path drifts across the map by itself. Slow movement without setting up an LFO.</dd></div>
+    <div><dt>FDBK</dt><dd>Sends the height back into X. A little is grit, a lot is chaos.</dd></div>
   </dl>
   <h3>SYN 4 &nbsp;·&nbsp; drum</h3>
   <dl class="feat">
-    <div><dt>STIM</dt><dd>Sweep time: how long the pitch drop at the start of each note lasts.</dd></div>
-    <div><dt>SDEP</dt><dd>Sweep depth: how far above the note the pitch starts. At 0 there is no sweep. Kicks, toms, zaps.</dd></div>
-    <div><dt>N.HLD</dt><dd>Noise hold: how long the noise stays at full level before it starts to fade.</dd></div>
-    <div><dt>N.DEC</dt><dd>Noise decay: how fast the noise fades after the hold.</dd></div>
-    <div><dt>BASE</dt><dd>The lowest frequency of the noise filter.</dd></div>
-    <div><dt>WDTH</dt><dd>How wide the noise band is above BASE. Narrow sounds like a tuned hiss, wide like plain noise.</dd></div>
-    <div><dt>GRAN</dt><dd>Grain of the noise: from fine hiss to coarse crackle.</dd></div>
-    <div><dt>N.LEV</dt><dd>How much noise is mixed with the tone. At 0, none.</dd></div>
+    <div><dt>STIM</dt><dd>How long the pitch drop at the start of each note takes.</dd></div>
+    <div><dt>SDEP</dt><dd>How far the pitch drops. Zero means no drop. Turn this and STIM up for kicks and toms.</dd></div>
+    <div><dt>N.HLD</dt><dd>How long the noise stays up before it fades.</dd></div>
+    <div><dt>N.DEC</dt><dd>How long the noise takes to fade.</dd></div>
+    <div><dt>BASE</dt><dd>Where the noise filter starts, at the bottom.</dd></div>
+    <div><dt>WDTH</dt><dd>How wide the noise is above BASE. Narrow sounds like a hissy tone, wide is just noise.</dd></div>
+    <div><dt>GRAN</dt><dd>Grain of the noise. Fine hiss at the bottom, crackle at the top.</dd></div>
+    <div><dt>N.LEV</dt><dd>How loud the noise is next to the tone.</dd></div>
   </dl>
-  <h3>SYN 5 &nbsp;·&nbsp; phase, sync and key tracking</h3>
+  <h3>SYN 5 &nbsp;·&nbsp; phase, sync, key</h3>
   <dl class="feat">
-    <div><dt>PHASE X / Y</dt><dd>Fine phase of each axis, from −1.00 to +1.00, for exact settings next to PHSX and PHSY.</dd></div>
-    <div><dt>SYNC X / Y</dt><dd>Hard sync: the axis runs faster, up to 16 times, and restarts at every period of the note. At 0 it is off. Turn it for the classic sync sweep.</dd></div>
-    <div><dt>KEY PHS X / Y</dt><dd>How much the phase of each axis moves with the note you play: higher notes read a different part of the land.</dd></div>
-    <div><dt>KEY PD X / Y</dt><dd>How much the phase distortion follows the note: brighter high notes, or the other way round.</dd></div>
+    <div><dt>PHASE X / Y</dt><dd>Fine phase for each axis, −1.00 to +1.00. For when PHSX and PHSY are too coarse.</dd></div>
+    <div><dt>SYNC X / Y</dt><dd>Hard sync. The axis runs faster and restarts with every cycle of the note. Off at zero, sweep it for that tearing sync sound.</dd></div>
+    <div><dt>KEY PHS X / Y</dt><dd>Higher notes shift the phase, so the tone changes a little as you go up the keyboard.</dd></div>
+    <div><dt>KEY PD X / Y</dt><dd>Same idea for phase distortion. Brighter on top, or darker, depending on which way you turn it.</dd></div>
   </dl>
 
   <h2 id="build"><span>04</span>Build it</h2>
