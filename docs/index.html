@@ -75,7 +75,8 @@
   footer a { color: var(--mute); }
 
 
-  .play { margin-top: 8px; }
+  .play { margin-top: 8px; user-select: none; -webkit-user-select: none; }
+  body.drag, body.drag * { user-select: none !important; -webkit-user-select: none !important; cursor: ns-resize; }
   a.go { font: 600 14px var(--mono); font-style: normal; white-space: nowrap; }
   .play .screen { cursor: crosshair; }
   .knobs { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px 6px; margin-top: 14px; user-select: none; }
@@ -315,7 +316,9 @@ async function playable() {
     box.append(el); ui[k.id] = el;
     const set = (v) => { vals[k.id] = Math.max(k.min, Math.min(k.max, v)); show(k); redraw(); };
     let y0 = 0, v0 = 0;
-    el.addEventListener("pointerdown", (e) => { el.setPointerCapture(e.pointerId); y0 = e.clientY; v0 = vals[k.id]; });
+    el.addEventListener("pointerdown", (e) => { e.preventDefault(); getSelection().removeAllRanges(); document.body.classList.add("drag"); el.setPointerCapture(e.pointerId); y0 = e.clientY; v0 = vals[k.id]; });
+    el.addEventListener("pointerup", () => document.body.classList.remove("drag"));
+    el.addEventListener("lostpointercapture", () => document.body.classList.remove("drag"));
     el.addEventListener("pointermove", (e) => { if (!el.hasPointerCapture(e.pointerId)) return; set(v0 + Math.round((y0 - e.clientY) / 3) * k.step); });
     el.addEventListener("wheel", (e) => { e.preventDefault(); set(vals[k.id] + (e.deltaY < 0 ? k.step : -k.step)); }, { passive: false });
     el.addEventListener("dblclick", () => set(k.def));
@@ -324,7 +327,7 @@ async function playable() {
   T.KNOBS.forEach(show);
   // the map: drag the cursor
   const fromEvent = (e) => { const r = c.getBoundingClientRect(); return [((e.clientX - r.left) / r.width) * 128, ((e.clientY - r.top) / r.height) * 64]; };
-  c.addEventListener("pointerdown", (e) => { c.setPointerCapture(e.pointerId); move(e); });
+  c.addEventListener("pointerdown", (e) => { e.preventDefault(); getSelection().removeAllRanges(); c.setPointerCapture(e.pointerId); move(e); });
   c.addEventListener("pointermove", (e) => { if (c.hasPointerCapture(e.pointerId)) move(e); });
   function move(e) { const [px, py] = fromEvent(e); if (py > 32) return; const [wx, wy] = T.posFromPixel(px, py); vals.posx = wx; vals.posy = wy; show(T.KNOBS[4]); show(T.KNOBS[5]); redraw(); }
   // sound
