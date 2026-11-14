@@ -348,7 +348,7 @@ async function playable() {
     await ctx.audioWorklet.addModule("js/terrain-voice.js");
     node = new AudioWorkletNode(ctx, "terrain-voice", { outputChannelCount: [2] });
     node.connect(ctx.destination);
-    node.port.postMessage({ lands: (await (await fetch("img/lands.bin")).arrayBuffer()) });
+    node.port.postMessage({ asm: await (await fetch("js/lands-asm.json")).json() });
     draw();
   }
   const freq = (n) => 440 * Math.pow(2, (n + T.tuneSemi(vals.tune) - 69) / 12);

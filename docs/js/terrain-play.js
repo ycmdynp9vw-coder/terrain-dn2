@@ -24,19 +24,19 @@ export const WAVN = ["SIN", "TRI", "SQR", "SAW"];
 export const KNOBS = [
   { id: "tune", lab: "TUNE", min: 0x400, max: 0x7c00, def: 0x4000, step: 256, kind: "semi" },
   { id: "bank", lab: "BANK", min: 0, max: 0x700, def: 0, step: 256, kind: "bank", w: 0 },
-  { id: "terr", lab: "TERR", min: 0, max: 0x7f00, def: 0x0d00, step: 256, kind: "terr", w: 1 },
+  { id: "terr", lab: "TERR", min: 0, max: 0x7f00, def: 0, step: 256, kind: "terr", w: 1 },
   { id: "warp", lab: "WARP", min: 0, max: 0x7f00, def: 0, step: 256, kind: "u", w: 2 },
   { id: "posx", lab: "POSX", min: 0, max: 0x7f00, def: 0x4000, step: 256, kind: "b", w: 4 },
   { id: "posy", lab: "POSY", min: 0, max: 0x7f00, def: 0x4000, step: 256, kind: "b", w: 5 },
-  { id: "zoom", lab: "ZOOM", min: 0, max: 0x7f00, def: 0x4800, step: 256, kind: "u", w: 6 },
+  { id: "zoom", lab: "ZOOM", min: 0, max: 0x7f00, def: 0x4000, step: 256, kind: "u", w: 6 },
   { id: "mod", lab: "MOD", min: 0, max: 0x7f00, def: 0, step: 256, kind: "u", w: 7 },
   { id: "tunx", lab: "TUNX", min: 0x400, max: 0x7c00, def: 0x4000, step: 256, kind: "semi", w: 8 },
   { id: "wavx", lab: "WAVX", min: 0, max: 0x300, def: 0, step: 256, kind: "wav", w: 9 },
   { id: "phsx", lab: "PHSX", min: 0, max: 0x7f00, def: 0x4000, step: 256, kind: "b", w: 10 },
   { id: "pdx", lab: "PDX", min: 0, max: 0x7f00, def: 0x4000, step: 256, kind: "b", w: 11 },
-  { id: "tuny", lab: "TUNY", min: 0x400, max: 0x7c00, def: 0x4000 + 12 * 256, step: 256, kind: "semi", w: 12 },
+  { id: "tuny", lab: "TUNY", min: 0x400, max: 0x7c00, def: 0x4000, step: 256, kind: "semi", w: 12 },
   { id: "wavy", lab: "WAVY", min: 0, max: 0x300, def: 0, step: 256, kind: "wav", w: 13 },
-  { id: "phsy", lab: "PHSY", min: 0, max: 0x7f00, def: 0x4800, step: 256, kind: "b", w: 14 },
+  { id: "phsy", lab: "PHSY", min: 0, max: 0x7f00, def: 0x4000, step: 256, kind: "b", w: 14 },
   { id: "pdy", lab: "PDY", min: 0, max: 0x7f00, def: 0x4000, step: 256, kind: "b", w: 15 },
 ];
 export function shown(k, v) {
@@ -174,14 +174,15 @@ export function posFromPixel(x, y) { // map pixel -> POSX, POSY words
   return [clampi(Math.round(0x4000 + (bx * 0x3f00) / 4096), 0, 0x7f00), clampi(Math.round(0x4000 + (by * 0x3f00) / 4096), 0, 0x7f00)];
 }
 
-// the voice's settings from the knobs (sent to the worklet)
+// the voice's settings from the knobs (sent to the worklet), in surface units (Q12 / 4096) and turns
 export function voiceParams(w) {
-  const zm = zoomq(w), sz = qmul(siz(w, 0), zm), t = U(w[1]) * 7, a = Math.min(6, t >> 12);
+  const zm = zoomq(w), t = U(w[1]) * 7, a = Math.min(6, t >> 12);
   return {
-    bank: STEP(w[0], 7), a, f: (t - (a << 12)) / 4096, wp: U(w[2]) / 4096,
-    cx: rdiv(BIP(w[4]) * DX, 4096), cy: BIP(w[5]), sx: sz, sy: qmul(siz(w, 1), zm), md: qmul(U(w[7]), 1843) / 4096,
-    rx: Math.pow(2, SEMI(w[8]) / 12), wx: STEP(w[9], 3), phx: Math.trunc(BIP(w[10]) / 2), pdx: BIP(w[11]) / 4096,
-    ry: Math.pow(2, SEMI(w[12]) / 12), wy: STEP(w[13], 3), phy: Math.trunc(BIP(w[14]) / 2), pdy: BIP(w[15]) / 4096,
+    bank: STEP(w[0], 7), a, f: (t - (a << 12)) / 4096, wp: U(w[2]) / 4096, fb: qmul(U(w[23]), 3072) / 4096,
+    cx: rdiv(BIP(w[4]) * DX, 4096) / 4096, cy: BIP(w[5]) / 4096, sx: qmul(siz(w, 0), zm) / 4096, sy: qmul(siz(w, 1), zm) / 4096,
+    md: qmul(U(w[7]), 1843) / 4096,
+    rx: Math.pow(2, SEMI(w[8]) / 12), wx: STEP(w[9], 3), phx: Math.trunc(BIP(w[10]) / 2) / 4096, pdx: BIP(w[11]) / 4096,
+    ry: Math.pow(2, SEMI(w[12]) / 12), wy: STEP(w[13], 3), phy: Math.trunc(BIP(w[14]) / 2) / 4096, pdy: BIP(w[15]) / 4096,
   };
 }
 export const tuneSemi = (v) => SEMI(v);
