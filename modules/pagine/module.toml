@@ -1,6 +1,6 @@
 [module]
 id = "em/pagine"
-version = "3.14.0"
+version = "3.14.1"
 name = "Pagine dei motori"
 category = "machines"
 type = "raw"
@@ -94,6 +94,24 @@ width = 4
 
 [[claim]]
 resource = "em.syn.vtable"
+
+# 14/11: il giro della pagina SYN (vtable +60, 0x4001704e) passa da em_syn_turn: FUNC + giro muove i parametri dei nostri motori.
+[[op]]
+op = "write"
+cpu = "cf"
+anchor = "em.syn.turn"
+offset = 0
+value = "em_syn_turn"
+width = 4
+
+[[claim]]
+resource = "em.syn.turn"
+
+[[anchor_rule]]
+name = "em.syn.turn"
+cpu = "cf"
+kind = "cf_words"
+words = [0x4001704e, 0x40063f06]
 
 [[anchor_rule]]
 name = "em.syn.vtable"

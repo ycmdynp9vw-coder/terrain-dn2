@@ -12,10 +12,10 @@ index 7e13862b..317b2e94 100644
  
  # The sample pool adapter's device facts (docs/design/sample-api-1.5.md 2.3); generated into core/sample-pool build/gen/sample-pool-{dev}.inc.
 diff --git a/devices/ports/dn2-1.12.toml b/devices/ports/dn2-1.12.toml
-index 6fcdf6e9..b22702c4 100644
+index 6fcdf6e9..ae43b083 100644
 --- a/devices/ports/dn2-1.12.toml
 +++ b/devices/ports/dn2-1.12.toml
-@@ -4059,3 +4059,777 @@ mode = "retarget"
+@@ -4059,3 +4059,787 @@ mode = "retarget"
  name = "dsp.voice.hook.uy_reset.call"
  site = "dsp.voice.site.uy_reset.call"
  mode = "retarget"
@@ -39,6 +39,16 @@ index 6fcdf6e9..b22702c4 100644
 +addr = 0x401d4db8
 +len = 12
 +sha256 = "2798f0ab01babc73994d0bd1eebd2af3cfa5473cc0326d3b6995ed4154e2a72e"
++mark = "D"
++rule = "em/pagine:cf_words"
++
++[[anchor]]
++name = "em.syn.turn"
++cpu = "cf"
++kind = "data"
++addr = 0x401d4df4
++len = 4
++sha256 = "ee9a9207d7a781e2dad9f347eaca2ef90d4924d2570e14d696bfbe468cb27996"
 +mark = "D"
 +rule = "em/pagine:cf_words"
 +

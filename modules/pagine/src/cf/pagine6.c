@@ -212,3 +212,22 @@ int em_syn_key(void *view, void *ev)
     }
     return STOCK_KEY(view, ev);
 }
+
+/* ---- 14/11: FUNC + giro sui nostri motori. Il giro della pagina SYN (vtable +60, 0x4001704e -> base 0x40067470) con FUNC
+ * tenuto non muove i parametri dei moduli. Sui nostri motori il giro passa al gestore di serie con FUNC visto come lasciato
+ * (bit 0 del byte 0x445a2e32, quello che legge 0x4011fac4(0x11)), poi FUNC torna com'era: gira come un giro normale. */
+#define STOCK_TURN ((int (*)(void *, void *))0x4001704Eu)
+#define KEYS_FUNC  (*(volatile u8 *)0x445A2E32u)
+
+int em_syn_turn(void *view, void *ev)
+{
+    int t = machine_type(view), ours = 0;
+    for (int e = 0; e < E_N; e++) if (t == (int)(u32)MOT[e].type) ours = 1;
+    if (ours && (KEYS_FUNC & 1)) {
+        KEYS_FUNC = (u8)(KEYS_FUNC & ~1);
+        int r = STOCK_TURN(view, ev);
+        KEYS_FUNC = (u8)(KEYS_FUNC | 1);
+        return r;
+    }
+    return STOCK_TURN(view, ev);
+}
