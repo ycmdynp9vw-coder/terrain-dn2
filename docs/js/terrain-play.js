@@ -186,3 +186,11 @@ export function voiceParams(w) {
   };
 }
 export const tuneSemi = (v) => SEMI(v);
+
+// the knob words at the machine's defaults, all 24 used by the drawing (em_render6's order)
+export function defaultWords() {
+  const w = new Array(40).fill(0x4000);
+  w[0] = 0; w[1] = 0; w[2] = 0; w[3] = 0; w[7] = 0; w[9] = 0; w[13] = 0; w[18] = 0; w[19] = 0x4000; w[20] = 0; w[21] = 0; w[22] = 0; w[23] = 0;
+  return w;
+}
+export const helpers = { U, BIP, SEMI, STEP, sinq, qmul };

@@ -37,7 +37,7 @@
   h3 { font: 600 13px/1.3 var(--mono); letter-spacing: .04em; color: var(--mute); margin: 30px 0 6px; text-transform: uppercase; }
 
   dl.feat { margin: 0; }
-  dl.feat div { display: grid; grid-template-columns: 150px 1fr; gap: 18px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+  dl.feat div { display: grid; grid-template-columns: 160px 1fr; gap: 18px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
   dl.feat div:first-child { padding-top: 2px; }
   dt { font: 600 13px/1.9 var(--mono); letter-spacing: .03em; }
   dd { margin: 0; }
@@ -93,7 +93,12 @@
   .kbd .b { height: 42px; background: var(--ink); z-index: 2; }
   .kbd .on { background: var(--blue) !important; }
   .kbd .oct { position: absolute; right: 0; bottom: -20px; font: 11px var(--mono); color: var(--mute); }
+
+  canvas.demo { display: block; width: 140px; aspect-ratio: 102 / 40; background: #000; margin-top: 8px; border-radius: 2px; image-rendering: pixelated; }
+  #hexbg { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
+  main { background: rgba(243, 239, 230, .9); box-shadow: 0 0 0 1px rgba(214, 205, 187, .5); min-height: 100vh; }
   @media (max-width: 620px) {
+    canvas.demo { width: 150px; }
     main { padding: 18px 16px 60px; }
     .top { flex-wrap: wrap; font-size: 12px; }
     header { padding-top: 32px; }
@@ -113,6 +118,7 @@
 </style>
 </head>
 <body>
+<canvas id="hexbg" aria-hidden="true"></canvas>
 <main>
   <div class="top"><span>blskk &nbsp;/&nbsp; terrain</span><span><a href="https://www.instagram.com/emablskk/">instagram</a> &nbsp;·&nbsp; <a id="srcTop" href="#">source</a> &nbsp;·&nbsp; <span id="ver">v63c</span></span></div>
 
@@ -154,49 +160,49 @@
   <p>Five pages, eight knobs each. On the Digitone you can push an encoder to see the exact number.</p>
   <h3>SYN 1 &nbsp;·&nbsp; the map</h3>
   <dl class="feat">
-    <div><dt>TUNE</dt><dd>The pitch, in semitones. Same as TUNE on any other machine.</dd></div>
-    <div><dt>BANK</dt><dd>Eight sets of terrains. CLSC is the plain stuff, HARM sounds like organs, EDGE has steps and corners, CHAO is the messy one, FM is FM, FOLD folds, BITS is digital dirt, CHEB is all clean harmonics.</dd></div>
-    <div><dt>TERR</dt><dd>Picks a terrain inside the bank. It doesn't jump, it fades into the next one, so you can sweep it with an LFO. The name shows up top right.</dd></div>
-    <div><dt>WARP</dt><dd>Folds the sound back over itself. Turn it up slowly, it goes from warm to metal pretty fast.</dd></div>
-    <div><dt>POSX / POSY</dt><dd>Moves the cross around the map, and the whole path with it. Grab this one first: same terrain, different spot, different sound.</dd></div>
-    <div><dt>ZOOM</dt><dd>How big the path is. Small and the point barely moves, so you get something close to a sine wave. Big and it runs over the hills and gets bright.</dd></div>
-    <div><dt>MOD</dt><dd>Lets Y push X around, a bit like FM. The path ties itself in knots.</dd></div>
+    <div><dt>TUNE<canvas class="demo px" data-demo="tune" aria-hidden="true"></canvas></dt><dd>The pitch, in semitones. Same as TUNE on any other machine.</dd></div>
+    <div><dt>BANK<canvas class="demo px" data-demo="bank" aria-hidden="true"></canvas></dt><dd>Eight sets of terrains. CLSC is the plain stuff, HARM sounds like organs, EDGE has steps and corners, CHAO is the messy one, FM is FM, FOLD folds, BITS is digital dirt, CHEB is all clean harmonics.</dd></div>
+    <div><dt>TERR<canvas class="demo px" data-demo="terr" aria-hidden="true"></canvas></dt><dd>Picks a terrain inside the bank. It doesn't jump, it fades into the next one, so you can sweep it with an LFO. The name shows up top right.</dd></div>
+    <div><dt>WARP<canvas class="demo px" data-demo="warp" aria-hidden="true"></canvas></dt><dd>Folds the sound back over itself. Turn it up slowly, it goes from warm to metal pretty fast.</dd></div>
+    <div><dt>POSX / POSY<canvas class="demo px" data-demo="posx" aria-hidden="true"></canvas></dt><dd>Moves the cross around the map, and the whole path with it. Grab this one first: same terrain, different spot, different sound.</dd></div>
+    <div><dt>ZOOM<canvas class="demo px" data-demo="zoom" aria-hidden="true"></canvas></dt><dd>How big the path is. Small and the point barely moves, so you get something close to a sine wave. Big and it runs over the hills and gets bright.</dd></div>
+    <div><dt>MOD<canvas class="demo px" data-demo="mod" aria-hidden="true"></canvas></dt><dd>Lets Y push X around, a bit like FM. The path ties itself in knots.</dd></div>
   </dl>
   <h3>SYN 2 &nbsp;·&nbsp; the two axes</h3>
   <dl class="feat">
-    <div><dt>TUNX / TUNY</dt><dd>Each axis has its own tuning against the note. Same pitch on both gives a line or a circle, an octave apart gives a figure eight. Anything else gets clangy and bell-like, which is half the fun.</dd></div>
-    <div><dt>WAVX / WAVY</dt><dd>The wave that pushes the point along that axis. SIN is smooth, TRI goes straight, SQR jumps between two spots, SAW goes one way and snaps back.</dd></div>
-    <div><dt>PHSX / PHSY</dt><dd>Shifts one axis against the other. With the same tuning on both, this is what opens a line into a circle.</dd></div>
-    <div><dt>PDX / PDY</dt><dd>Phase distortion, the old Casio CZ trick. Bends the wave to one side or the other depending on which way you turn. Brighter, a bit resonant.</dd></div>
+    <div><dt>TUNX / TUNY<canvas class="demo px" data-demo="tuny" aria-hidden="true"></canvas></dt><dd>Each axis has its own tuning against the note. Same pitch on both gives a line or a circle, an octave apart gives a figure eight. Anything else gets clangy and bell-like, which is half the fun.</dd></div>
+    <div><dt>WAVX / WAVY<canvas class="demo px" data-demo="wavx" aria-hidden="true"></canvas></dt><dd>The wave that pushes the point along that axis. SIN is smooth, TRI goes straight, SQR jumps between two spots, SAW goes one way and snaps back.</dd></div>
+    <div><dt>PHSX / PHSY<canvas class="demo px" data-demo="phsy" aria-hidden="true"></canvas></dt><dd>Shifts one axis against the other. With the same tuning on both, this is what opens a line into a circle.</dd></div>
+    <div><dt>PDX / PDY<canvas class="demo px" data-demo="pdx" aria-hidden="true"></canvas></dt><dd>Phase distortion, the old Casio CZ trick. Bends the wave to one side or the other depending on which way you turn. Brighter, a bit resonant.</dd></div>
   </dl>
   <h3>SYN 3 &nbsp;·&nbsp; the land</h3>
   <dl class="feat">
-    <div><dt>ASPT</dt><dd>Stretches the path wider or taller. Left for X, right for Y.</dd></div>
-    <div><dt>ROTA</dt><dd>Turns the path around on the map.</dd></div>
-    <div><dt>GRAN</dt><dd>Instead of gliding, the point hops from square to square. Lo-fi and steppy.</dd></div>
-    <div><dt>CURV</dt><dd>Bends the path near the edges. Positive throws it out onto the hills, negative pulls it back to the middle.</dd></div>
-    <div><dt>ERSN</dt><dd>Erosion. Sands the terrain down, so it gets darker and softer.</dd></div>
-    <div><dt>RIDG</dt><dd>Ridges. Sharpens the tops, more edge and fizz.</dd></div>
-    <div><dt>WIND</dt><dd>The path drifts across the map by itself. Slow movement without setting up an LFO.</dd></div>
-    <div><dt>FDBK</dt><dd>Sends the height back into X. A little is grit, a lot is chaos.</dd></div>
+    <div><dt>ASPT<canvas class="demo px" data-demo="aspt" aria-hidden="true"></canvas></dt><dd>Stretches the path wider or taller. Left for X, right for Y.</dd></div>
+    <div><dt>ROTA<canvas class="demo px" data-demo="rota" aria-hidden="true"></canvas></dt><dd>Turns the path around on the map.</dd></div>
+    <div><dt>GRAN<canvas class="demo px" data-demo="gran" aria-hidden="true"></canvas></dt><dd>Instead of gliding, the point hops from square to square. Lo-fi and steppy.</dd></div>
+    <div><dt>CURV<canvas class="demo px" data-demo="curv" aria-hidden="true"></canvas></dt><dd>Bends the path near the edges. Positive throws it out onto the hills, negative pulls it back to the middle.</dd></div>
+    <div><dt>ERSN<canvas class="demo px" data-demo="ersn" aria-hidden="true"></canvas></dt><dd>Erosion. Sands the terrain down, so it gets darker and softer.</dd></div>
+    <div><dt>RIDG<canvas class="demo px" data-demo="ridg" aria-hidden="true"></canvas></dt><dd>Ridges. Sharpens the tops, more edge and fizz.</dd></div>
+    <div><dt>WIND<canvas class="demo px" data-demo="wind" aria-hidden="true"></canvas></dt><dd>The path drifts across the map by itself. Slow movement without setting up an LFO.</dd></div>
+    <div><dt>FDBK<canvas class="demo px" data-demo="fdbk" aria-hidden="true"></canvas></dt><dd>Sends the height back into X. A little is grit, a lot is chaos.</dd></div>
   </dl>
   <h3>SYN 4 &nbsp;·&nbsp; drum</h3>
   <dl class="feat">
-    <div><dt>STIM</dt><dd>How long the pitch drop at the start of each note takes.</dd></div>
-    <div><dt>SDEP</dt><dd>How far the pitch drops. Zero means no drop. Turn this and STIM up for kicks and toms.</dd></div>
-    <div><dt>N.HLD</dt><dd>How long the noise stays up before it fades.</dd></div>
-    <div><dt>N.DEC</dt><dd>How long the noise takes to fade.</dd></div>
-    <div><dt>BASE</dt><dd>Where the noise filter starts, at the bottom.</dd></div>
-    <div><dt>WDTH</dt><dd>How wide the noise is above BASE. Narrow sounds like a hissy tone, wide is just noise.</dd></div>
-    <div><dt>GRAN</dt><dd>Grain of the noise. Fine hiss at the bottom, crackle at the top.</dd></div>
-    <div><dt>N.LEV</dt><dd>How loud the noise is next to the tone.</dd></div>
+    <div><dt>STIM<canvas class="demo px" data-demo="stim" aria-hidden="true"></canvas></dt><dd>How long the pitch drop at the start of each note takes.</dd></div>
+    <div><dt>SDEP<canvas class="demo px" data-demo="sdep" aria-hidden="true"></canvas></dt><dd>How far the pitch drops. Zero means no drop. Turn this and STIM up for kicks and toms.</dd></div>
+    <div><dt>N.HLD<canvas class="demo px" data-demo="nhld" aria-hidden="true"></canvas></dt><dd>How long the noise stays up before it fades.</dd></div>
+    <div><dt>N.DEC<canvas class="demo px" data-demo="ndec" aria-hidden="true"></canvas></dt><dd>How long the noise takes to fade.</dd></div>
+    <div><dt>BASE<canvas class="demo px" data-demo="base" aria-hidden="true"></canvas></dt><dd>Where the noise filter starts, at the bottom.</dd></div>
+    <div><dt>WDTH<canvas class="demo px" data-demo="wdth" aria-hidden="true"></canvas></dt><dd>How wide the noise is above BASE. Narrow sounds like a hissy tone, wide is just noise.</dd></div>
+    <div><dt>GRAN<canvas class="demo px" data-demo="ngrn" aria-hidden="true"></canvas></dt><dd>Grain of the noise. Fine hiss at the bottom, crackle at the top.</dd></div>
+    <div><dt>N.LEV<canvas class="demo px" data-demo="nlev" aria-hidden="true"></canvas></dt><dd>How loud the noise is next to the tone.</dd></div>
   </dl>
   <h3>SYN 5 &nbsp;·&nbsp; phase, sync, key</h3>
   <dl class="feat">
-    <div><dt>PHASE X / Y</dt><dd>Fine phase for each axis, −1.00 to +1.00. For when PHSX and PHSY are too coarse.</dd></div>
-    <div><dt>SYNC X / Y</dt><dd>Hard sync. The axis runs faster and restarts with every cycle of the note. Off at zero, sweep it for that tearing sync sound.</dd></div>
-    <div><dt>KEY PHS X / Y</dt><dd>Higher notes shift the phase, so the tone changes a little as you go up the keyboard.</dd></div>
-    <div><dt>KEY PD X / Y</dt><dd>Same idea for phase distortion. Brighter on top, or darker, depending on which way you turn it.</dd></div>
+    <div><dt>PHASE X / Y<canvas class="demo px" data-demo="pfnx" aria-hidden="true"></canvas></dt><dd>Fine phase for each axis, −1.00 to +1.00. For when PHSX and PHSY are too coarse.</dd></div>
+    <div><dt>SYNC X / Y<canvas class="demo px" data-demo="synx" aria-hidden="true"></canvas></dt><dd>Hard sync. The axis runs faster and restarts with every cycle of the note. Off at zero, sweep it for that tearing sync sound.</dd></div>
+    <div><dt>KEY PHS X / Y<canvas class="demo px" data-demo="ptkx" aria-hidden="true"></canvas></dt><dd>Higher notes shift the phase, so the tone changes a little as you go up the keyboard.</dd></div>
+    <div><dt>KEY PD X / Y<canvas class="demo px" data-demo="dtkx" aria-hidden="true"></canvas></dt><dd>Same idea for phase distortion. Brighter on top, or darker, depending on which way you turn it.</dd></div>
   </dl>
 
   <h2 id="build"><span>04</span>Build it</h2>
@@ -244,6 +250,7 @@
 <script type="module">
 import { buildFirmware } from "./js/costruisci.js";
 import * as T from "./js/terrain-play.js";
+import * as Demos from "./js/param-demos.js";
 const PATCH = "patch/patch-v63c.json", OUT = "TERRAIN-dn2-1.12-v63c.syx";
 const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $ = (id) => document.getElementById(id);
@@ -401,6 +408,33 @@ async function hero() {
   frame();
 }
 
+// ---------- background: our own bytes, from the patch ----------
+async function hexbg() {
+  const patch = await patchP, pool = [];
+  for (const sec of Object.values(patch.sections)) for (const op of sec.ops) if (op[0] === "l" && pool.length < 6000) { const b = atob(op[1]); for (let i = 0; i < b.length && pool.length < 6000; i++) pool.push(b.charCodeAt(i)); }
+  const c = $("hexbg"), x = c.getContext("2d"), CW = 21, CH = 15, BG = "#ebe5d8";
+  let cols = 0, cells = [];
+  const tint = () => { const r = Math.random(); return r < .012 ? "rgba(36,64,201,.45)" : r < .02 ? "rgba(28,26,22,.28)" : null; };
+  function cell(i) { const cx = (i % cols) * CW + 3, cy = Math.floor(i / cols) * CH + 11, e = cells[i];
+    x.fillStyle = BG; x.fillRect(cx - 1, cy - 11, CW, CH); x.fillStyle = e.t || "rgba(28,26,22,.11)"; x.fillText(e.b.toString(16).padStart(2, "0"), cx, cy); }
+  function size() {
+    const dpr = Math.min(2, devicePixelRatio || 1); c.width = innerWidth * dpr; c.height = innerHeight * dpr; x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cols = Math.ceil(innerWidth / CW) + 1; const rows = Math.ceil(innerHeight / CH) + 1;
+    let k = (Math.random() * pool.length) | 0; cells = [];
+    for (let i = 0; i < cols * rows; i++) cells.push({ b: pool[k++ % pool.length], t: tint() });
+    x.font = "11px ui-monospace, SF Mono, Menlo, monospace"; x.fillStyle = BG; x.fillRect(0, 0, innerWidth, innerHeight);
+    for (let i = 0; i < cells.length; i++) cell(i);
+  }
+  size(); addEventListener("resize", size);
+  if (still) return;
+  setInterval(() => {
+    x.font = "11px ui-monospace, SF Mono, Menlo, monospace";
+    const run = Math.random() < .07, n = run ? 20 + (Math.random() * 50) | 0 : 3;
+    let i = (Math.random() * cells.length) | 0;
+    for (let k = 0; k < n; k++) { cells[i].b = run ? (Math.random() * 256) | 0 : pool[(Math.random() * pool.length) | 0]; cells[i].t = run && Math.random() < .5 ? "rgba(36,64,201,.4)" : tint(); cell(i); i = run ? (i + 1) % cells.length : (Math.random() * cells.length) | 0; }
+  }, 150);
+}
+
 stamp($("mark"), "TERRAIN", 10, true); pages(); hero(); playable();
 
 // ---------- builder ----------
@@ -428,6 +462,7 @@ dl.addEventListener("click", () => {
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([result.syx], { type: "application/octet-stream" }));
   a.download = OUT; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 });
+hexbg(); T.loadLands("img/lands.bin").then(() => Demos.start());
 </script>
 </body>
 </html>
