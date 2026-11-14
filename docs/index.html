@@ -3,300 +3,272 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TERRAIN for Digitone II — custom OS builder</title>
+<title>TERRAIN for Digitone II</title>
+<meta name="description" content="An unofficial OS for the Elektron Digitone II with a wave terrain synth machine. Built in your browser from your own OS 1.12 file.">
 <style>
-  :root {
-    --bg: #0b0b0b; --bg2: #121212; --card: #161616; --line: #262626; --text: #f1f1f1; --mute: #8c8c8c; --dim: #555;
-    --hot: #ff6a2b; --teal: #f1f1f1; --fuchsia: #f1f1f1; --amber: #f1f1f1; --green: #6fd38a; --ink: #0b0b0b;
-    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  }
+  :root { --paper: #f3efe6; --ink: #1c1a16; --mute: #6f685c; --rule: #d6cdbb; --blue: #2440c9; --tile: #0b0b0a;
+    --serif: Charter, "Bitstream Charter", "Iowan Old Style", "Sitka Text", Cambria, Georgia, serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
   * { box-sizing: border-box; }
-  html { background: var(--bg); }
-  body { margin: 0; color: var(--text); font: 16px/1.6 var(--sans); overflow-x: hidden; }
-  #hexbg { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
-  a { color: inherit; text-decoration-color: var(--hot); text-underline-offset: 3px; }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
-  .mono { font-family: var(--mono); }
+  html { background: var(--paper); }
+  body { margin: 0; color: var(--ink); font: 18px/1.62 var(--serif); -webkit-font-smoothing: antialiased; }
+  main { max-width: 700px; margin: 0 auto; padding: 28px 22px 80px; }
+  a { color: var(--blue); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { text-decoration-thickness: 2px; }
+  .mono, code { font-family: var(--mono); font-size: .82em; }
   .px { image-rendering: pixelated; image-rendering: crisp-edges; }
 
-  nav { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; gap: 16px; flex-wrap: wrap; }
-  .mark { font: 700 15px var(--mono); letter-spacing: .08em; }
-  .mark span { font-weight: 500; color: var(--mute); margin-left: 8px; letter-spacing: .14em; font-size: 11px; text-transform: uppercase; }
-  .navr { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-  .pill { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border: 1px solid var(--line); border-radius: 4px; background: transparent;
-    font: 600 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; text-decoration: none; color: var(--text); cursor: pointer; transition: border-color .12s, color .12s, background .12s; }
-  .pill:hover { border-color: var(--text); }
-  .pill.hot { background: var(--hot); border-color: var(--hot); color: var(--ink); }
-  .pill.hot:hover { background: #ff7444; }
-  .tagline { font: 600 11px var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--mute); }
-  
+  .top { display: flex; justify-content: space-between; gap: 12px; font: 13px/1.4 var(--mono); color: var(--mute); padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
+  .top a { color: var(--mute); }
+  header { padding: 46px 0 8px; }
+  #mark { display: block; width: min(100%, 430px); height: auto; image-rendering: pixelated; }
+  .sub { font-size: 21px; line-height: 1.45; margin: 22px 0 0; max-width: 33em; }
+  .sub em { font-style: italic; }
 
-  .hero { display: grid; grid-template-columns: .95fr 1.05fr; gap: 56px; align-items: center; padding: 56px 0 70px; position: relative; }
-  .screen { background: #000; border: 1px solid var(--line); border-radius: 6px; padding: 22px; box-shadow: 0 40px 60px -30px rgba(0,0,0,.9), 0 0 0 6px #050505; }
+  figure { margin: 38px 0; }
+  .screen { background: var(--tile); padding: 18px; border-radius: 3px; }
   .screen canvas { display: block; width: 100%; aspect-ratio: 2/1; }
-  #title { display: block; width: 100%; image-rendering: pixelated; margin: 0 0 18px; }
-  .kicker { font: 600 12px var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--mute); margin: 0 0 14px; }
-  .kicker b { color: var(--hot); font-weight: 600; }
-  .lede { font-size: 18px; max-width: 32em; color: #d9d2c3; }
-  .lede a { font-weight: 600; color: var(--text); }
-  .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
+  figcaption { font-size: 14.5px; color: var(--mute); margin-top: 10px; font-style: italic; }
+  figcaption b { font-style: normal; font-weight: 600; color: var(--ink); font-size: 13px; letter-spacing: .04em; }
 
-    box-shadow: 0 26px 40px -20px rgba(0,0,0,.9); }
+  h2 { font: 600 15px/1.2 var(--mono); letter-spacing: .02em; margin: 58px 0 16px; padding-top: 12px; border-top: 1px solid var(--ink); display: flex; gap: 14px; }
+  h2 span { color: var(--mute); font-weight: 400; }
+  p { margin: 0 0 14px; }
+  h3 { font: 600 13px/1.3 var(--mono); letter-spacing: .04em; color: var(--mute); margin: 30px 0 6px; text-transform: uppercase; }
 
-  section { padding: 56px 0; }
-  .dith + section { padding-top: 40px; }
-  .specs { border-top: 1px solid var(--line); background: var(--bg); margin: 0; }
-  .spec { display: grid; grid-template-columns: 220px 1fr; gap: 24px; padding: 18px 0; border-bottom: 1px solid var(--line); }
-  .spec dt { font: 600 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--mute); padding-top: 3px; }
-  .spec dd { margin: 0; color: #d6d6d6; }
-  .spec dd b { color: var(--text); font-weight: 600; }
-  .meter { margin-top: 10px; height: 10px; background: #1b1b1b; position: relative; max-width: 560px; }
-  .meter span { position: absolute; top: 0; bottom: 0; }
-  .meter .st { left: 0; background: #4a4a4a; }
-  .meter .ours { background: var(--hot); }
-  .meter .line { width: 1px; background: var(--text); top: -4px; bottom: -4px; }
-  .mlab { display: flex; justify-content: space-between; max-width: 560px; font: 11px var(--mono); color: var(--mute); margin-top: 6px; }
-  .mlab i { display: inline-block; width: 8px; height: 8px; margin-right: 6px; vertical-align: 0; }
-  .sh canvas { display: block; image-rendering: pixelated; margin-bottom: 12px; }
-  .sub { color: var(--mute); margin: 0 0 26px; max-width: 42em; }
+  dl.feat { margin: 0; }
+  dl.feat div { display: grid; grid-template-columns: 150px 1fr; gap: 18px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+  dl.feat div:first-child { padding-top: 2px; }
+  dt { font: 600 13px/1.9 var(--mono); letter-spacing: .03em; }
+  dd { margin: 0; }
 
-  .pages { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
-  .page { background: #0a0a09; border: 1px solid var(--line); border-radius: 6px; padding: 8px; cursor: pointer; transition: border-color .15s, transform .15s; }
-  .page:hover { border-color: var(--fuchsia); transform: translateY(-2px); }
+  .pages { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .page { background: var(--tile); padding: 6px 6px 5px; border-radius: 2px; cursor: pointer; }
   .page canvas { width: 100%; display: block; aspect-ratio: 2/1; }
-  .page .n { color: var(--mute); font: 600 10px var(--mono); letter-spacing: .12em; margin-top: 7px; display: flex; justify-content: space-between; }
+  .page .n { color: #8d867a; font: 10px var(--mono); margin-top: 5px; letter-spacing: .06em; }
 
-  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-  .slot { background: var(--bg2); padding: 20px 20px 18px; position: relative; }
-  .slot h3 { margin: 0 0 8px; font: 600 12px var(--sans); letter-spacing: .16em; text-transform: uppercase; display: flex; align-items: center; gap: 9px; }
-  .slot h3 i { width: 6px; height: 6px; display: inline-block; background: var(--text) !important; }
-  .slot p { margin: 0; font-size: 14.5px; color: #c9c2b3; }
-  .slot .k { position: absolute; right: 16px; top: 18px; font: 600 10px var(--mono); letter-spacing: .12em; color: var(--dim); }
-  .slot.big { grid-column: span 2; }
-
-  .builder { background: var(--bg2); border: 1px solid var(--line); border-radius: 8px; padding: 24px; }
-  .bhead { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
-  .chips { display: flex; gap: 16px; flex-wrap: wrap; font: 600 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--mute); }
-  .chip i { width: 8px; height: 8px; display: inline-block; margin-right: 7px; background: var(--line); vertical-align: 0; }
-  .chip.ok { color: var(--text); } .chip.ok i { background: var(--green); } .chip.bad { color: var(--hot); } .chip.bad i { background: var(--hot); }
-  .drop { display: block; border: 1px dashed #4a463e; border-radius: 6px; padding: 32px 16px; text-align: center; cursor: pointer; transition: background .15s, border-color .15s; }
-  .drop:hover, .drop.over { border-color: var(--hot); background: #141414; }
-  .drop strong { font: 600 16px var(--sans); }
-  .drop small { display: block; color: var(--mute); margin-top: 4px; font-size: 13px; }
+  .build { border: 1px solid var(--ink); padding: 22px; margin-top: 8px; background: #f7f4ed; }
+  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .btn { font: 600 14px var(--mono); padding: 11px 16px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; border-radius: 2px; }
+  .btn:hover { background: #ebe5d8; }
+  .btn.dark { background: var(--ink); color: var(--paper); }
+  .btn.dark:hover { background: #33302a; }
+  .btn:disabled { border-color: var(--rule); background: transparent; color: #a79f90; cursor: default; }
+  .hint { font-size: 15px; color: var(--mute); }
   input[type=file] { display: none; }
-  .console { margin-top: 14px; background: #0c0c0b; border: 1px solid var(--line); color: #d9d2c3; border-radius: 6px; padding: 14px 16px; font: 13px/1.65 var(--mono); min-height: 64px; white-space: pre-wrap; word-break: break-word; }
-  .console .lbl { color: var(--dim); font-size: 10px; letter-spacing: .16em; display: block; margin-bottom: 4px; }
-  .console .ok { color: #8be0a4; } .console .bad { color: #ff9b7e; }
-  .bar { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; margin-top: 14px; font: 600 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
-  .bar b { color: var(--text); } .bar .sp { flex: 1; }
-  button.build { border: 0; border-radius: 4px; background: var(--hot); color: var(--ink); font: 700 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; padding: 13px 20px; cursor: pointer; }
-  button.build:disabled { background: #2c2925; color: var(--dim); cursor: default; }
+  .drop.over { outline: 2px dashed var(--blue); outline-offset: 6px; }
+  #log { margin: 18px 0 16px; font: 13px/1.75 var(--mono); white-space: pre-wrap; word-break: break-word; color: var(--ink); min-height: 2.2em; }
+  #log .ok { color: #2d7a3e; } #log .bad { color: #b3261e; } #log .dim { color: var(--mute); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 16px; }
+  td { padding: 10px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  td:first-child { font: 600 13px/1.9 var(--mono); width: 190px; padding-right: 18px; }
+  .bar { display: block; font: 12px/1.6 var(--mono); color: var(--mute); margin-top: 4px; letter-spacing: -.5px; white-space: nowrap; overflow: hidden; }
+  .bar b { color: var(--ink); font-weight: 400; } .bar i { color: var(--blue); font-style: normal; }
+
+  ul.log { list-style: none; padding: 0; margin: 0; }
+  ul.log li { display: grid; grid-template-columns: 70px 1fr; gap: 14px; padding: 6px 0; }
+  ul.log li span { font: 13px/1.9 var(--mono); color: var(--mute); }
+
+  footer { margin-top: 64px; padding-top: 14px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--mute); }
+  footer p { margin: 0 0 8px; }
+  footer a { color: var(--mute); }
 
 
-  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; max-width: 760px; margin: 0 auto; text-align: center; padding-top: 30px; }
-  .two h4 { font: 700 13px var(--mono); letter-spacing: .12em; text-transform: uppercase; margin: 0 0 8px; }
-  .two p { color: #c9c2b3; margin: 0; }
-  .warn { border-top: 2px solid var(--hot); padding-top: 10px; }
-  .two > div > h4 + p:not(.warn) { border-top: 2px solid var(--line); padding-top: 10px; }
-  footer { padding: 40px 0 60px; color: var(--mute); font-size: 13px; border-top: 1px solid var(--line); margin-top: 20px; }
-  footer p { margin: 6px 0; max-width: 62em; }
-  #burst { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 50; image-rendering: pixelated; }
-  .dith { display: block; width: 100%; height: 18px; image-rendering: pixelated; margin: 8px 0 0; }
-
-  @media (max-width: 860px) {
-    .spec { grid-template-columns: 1fr; gap: 6px; }
-    .hero { grid-template-columns: 1fr; }
-    .screen { order: -1; }
+  .play { margin-top: 8px; }
+  a.go { font: 600 14px var(--mono); font-style: normal; white-space: nowrap; }
+  .play .screen { cursor: crosshair; }
+  .knobs { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px 6px; margin-top: 14px; user-select: none; }
+  .knob { text-align: center; cursor: ns-resize; touch-action: none; padding: 4px 0; }
+  .knob .dial { width: 34px; height: 34px; margin: 0 auto; border-radius: 50%; border: 1.5px solid var(--ink); position: relative; background: #fbf9f4; }
+  .knob .dial i { position: absolute; left: 50%; top: 3px; width: 2px; height: 11px; margin-left: -1px; background: var(--ink); transform-origin: 50% 14px; }
+  .knob .l { font: 600 11px var(--mono); margin-top: 4px; letter-spacing: .04em; }
+  .knob .v { font: 11px var(--mono); color: var(--mute); }
+  .knob.row2 .dial { border-color: var(--mute); }
+  .kbd { position: relative; height: 70px; margin-top: 14px; user-select: none; touch-action: none; }
+  .kbd .w, .kbd .b { position: absolute; top: 0; border: 1px solid var(--ink); border-radius: 0 0 3px 3px; cursor: pointer; }
+  .kbd .w { height: 70px; background: #fbf9f4; z-index: 1; }
+  .kbd .b { height: 42px; background: var(--ink); z-index: 2; }
+  .kbd .on { background: var(--blue) !important; }
+  .kbd .oct { position: absolute; right: 0; bottom: -20px; font: 11px var(--mono); color: var(--mute); }
+  @media (max-width: 620px) {
+    .knobs { grid-template-columns: repeat(4, 1fr); }
+    body { font-size: 17px; }
+    dl.feat div { grid-template-columns: 1fr; gap: 2px; }
+    td:first-child { width: 120px; }
     .pages { grid-template-columns: repeat(2, 1fr); }
-    .grid { grid-template-columns: 1fr; } .slot.big { grid-column: auto; }
-    .two { grid-template-columns: 1fr; }
   }
-  @media (prefers-reduced-motion: reduce) { .page:hover { transform: none; } }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <nav>
-    <div class="mark">blskk<span>/ terrain</span></div>
-    <div class="navr">
-      <span class="tagline"><span class="t">DIGITONE II</span> · <span class="f">OS 1.12</span> · <span class="a" id="ver">V63C</span></span>
-      <a class="pill" id="srcLink" href="#">Source</a>
-      <a class="pill hot" href="#build">Build</a>
-    </div>
-  </nav>
+<main>
+  <div class="top"><span>blskk &nbsp;/&nbsp; terrain</span><span><a href="https://www.instagram.com/emablskk/">instagram</a> &nbsp;·&nbsp; <a id="srcTop" href="#">source</a> &nbsp;·&nbsp; <span id="ver">v63c</span></span></div>
 
-  <header class="hero">
-    <div>
-      <canvas id="title" aria-label="TERRAIN"></canvas>
-      <h1 style="position:absolute;left:-9999px">TERRAIN for Digitone II</h1>
-      <p class="lede">Unofficial custom OS for the Elektron Digitone II, with a <a href="#inside">new synth machine</a>. Built in your browser from your own OS 1.12 file, which never leaves your computer.</p>
-      <div class="hero-cta">
-        <a class="pill hot" href="#build">Build firmware .syx</a>
-        <a class="pill" href="#pages">See the pages</a>
-      </div>
-    </div>
-    <div class="screen" aria-hidden="true"><canvas id="scr" width="128" height="64" class="px"></canvas></div>
+  <header>
+    <canvas id="mark" aria-label="TERRAIN"></canvas>
+    <h1 style="position:absolute;left:-9999px">TERRAIN for Digitone II</h1>
+    <p class="sub">An unofficial OS for the Elektron Digitone II, with a synth machine that plays a point running across a landscape. You build it here, in your browser, from your own copy of OS 1.12.</p>
   </header>
-</div>
 
-<canvas id="hexbg" aria-hidden="true"></canvas>
-<canvas id="burst" aria-hidden="true"></canvas>
+  <figure>
+    <div class="screen"><canvas id="hero" width="128" height="64" class="px"></canvas></div>
+    <figcaption style="display:flex;justify-content:space-between;gap:12px"><span><b>FIG. 1</b> &nbsp;Page 1 of TERRAIN, as the Digitone draws it.</span><a class="go" href="#test">test it here! ↓</a></figcaption>
+  </figure>
 
-<div class="wrap">
-  <section id="inside">
-    <div class="sh"><canvas data-text="WHAT'S INSIDE"></canvas></div>
-    <div class="grid">
-      <div class="slot big"><h3><i style="background:var(--green)"></i>TERRAIN</h3>
-        <p>Wave terrain synthesis. 8 banks of 8 lands, warp, an FM-style MOD, phase distortion, land shaping (aspect, rotation, erosion, ridge, wind, feedback), a DRUM page with pitch sweep and filtered noise, sync and key tracking. Right below SWARMER.</p></div>
-      <div class="slot"><h3><i style="background:var(--teal)"></i>Five native pages</h3>
-        <p>Press an encoder to see the exact value.</p></div>
-      <div class="slot"><h3><i style="background:var(--fuchsia)"></i>NEGATIVE SCREEN</h3>
-        <p>PERSONALIZE › inverted display. P-locks still show up the right way round.</p></div>
-      <div class="slot"><h3><i style="background:var(--amber)"></i>MOD GRAPHICS</h3>
-        <p>TERRAIN's graphics glide to the new value when you turn, randomise or FUNC + turn.</p></div>
-      <div class="slot"><h3><i style="background:var(--hot)"></i>Boot animations</h3>
-        <p>Three new intros at power-on: GLITCH, RITO and FOURIER.</p></div>
-      <div class="slot big" style="grid-column:1/-1"><h3><i style="background:var(--text)"></i>Community mods</h3>
-        <p>Ported from <a href="https://github.com/angellinares/dn2_firmware_explore">dn2_firmware_explore</a>: more LFO destinations (FX and voice parameters), LFO ONE/HALF that hold their value, arpeggiator on MIDI tracks, SHUF and RAND arp modes, arp offsets in scale, MIDI out of audio tracks, reload confirm.</p></div>
-    </div>
-  </section>
+  <h2><span>01</span>What's in it</h2>
+  <dl class="feat">
+    <div><dt>TERRAIN</dt><dd>Wave terrain synthesis. 8 banks of 8 lands, warp, an FM-style MOD, phase distortion, land shaping (aspect, rotation, erosion, ridge, wind, feedback), a drum page with pitch sweep and filtered noise, sync and key tracking. In the machine list right below SWARMER.</dd></div>
+    <div><dt>Pages</dt><dd>Five of them, drawn to sit next to the stock machines. Press an encoder to read the exact value.</dd></div>
+    <div><dt>Negative screen</dt><dd>SETTINGS › PERSONALIZE. The whole display inverted; p-locks still read the right way round.</dd></div>
+    <div><dt>Mod graphics</dt><dd>SETTINGS › PERSONALIZE. TERRAIN's drawings glide to the new value when you turn, randomise or FUNC + turn.</dd></div>
+    <div><dt>Boot</dt><dd>Three intros, one after the other at each power-on: GLITCH, RITO, FOURIER.</dd></div>
+    <div><dt>From dnfw</dt><dd>Ported from <a href="https://github.com/angellinares/dn2_firmware_explore">dn2_firmware_explore</a>: more LFO destinations, LFO ONE/HALF that hold their value, arpeggiator on MIDI tracks, SHUF and RAND arp modes, arp offsets in scale, MIDI out of audio tracks, reload confirm.</dd></div>
+  </dl>
 
-  <canvas class="dith" aria-hidden="true"></canvas>
-  <section id="pages">
-    <div class="sh"><canvas data-text="THE PAGES"></canvas></div>
+  <figure>
     <div class="pages" id="pagesRow"></div>
-  </section>
+    <figcaption><b>FIG. 2</b> &nbsp;The five pages, as the emulator draws them. Click one to see it in negative.</figcaption>
+  </figure>
 
+  <h2 id="test"><span>02</span>Test it</h2>
+  <div class="play">
+    <div class="screen"><canvas id="scr" width="128" height="64" class="px"></canvas></div>
+    <div class="knobs" id="knobs"></div>
+    <div class="kbd" id="kbd"></div>
+  </div>
+  <p class="hint" style="margin-top:28px">Drag the knobs and the cursor. Play the keys, or <code>A</code>–<code>K</code> on your keyboard.</p>
 
-  <canvas class="dith" aria-hidden="true"></canvas>
-  <section id="build">
-    <div class="builder">
-      <div class="bhead">
-        <div><div class="sh"><canvas data-text="BUILD YOUR OS"></canvas></div></div>
-        <div class="chips"><span class="chip" id="c1"><i></i>OS 1.12</span><span class="chip" id="c2"><i></i>main OS</span><span class="chip" id="c3"><i></i>DSP</span><span class="chip" id="c4"><i></i>integrity</span></div>
-      </div>
-      <label class="drop" id="drop" for="file"><strong>Drop Digitone_II_OS1.12.syx</strong></label>
-      <input type="file" id="file" accept=".syx">
-      <div class="console" id="log">Waiting for your file.</div>
-      <div class="bar"><span>Our bytes <b id="ours">—</b></span><span>Checks <b id="checks">—</b></span><span class="sp"></span>
-        <button class="build" id="dl" disabled>Download .syx</button></div>
-    </div>
-  </section>
+  <h2 id="params"><span>03</span>The parameters</h2>
+  <p>Five pages of eight knobs. On the Digitone, press an encoder to read its exact value.</p>
+  <h3>SYN 1 &nbsp;·&nbsp; the land and the point</h3>
+  <dl class="feat">
+    <div><dt>TUNE</dt><dd>Pitch of the whole machine, in semitones. The point runs one lap of its path for every period of the note you play.</dd></div>
+    <div><dt>BANK</dt><dd>Picks one of eight families of lands: CLSC classic shapes, HARM harmonic (organ-like), EDGE sharp edges and steps, CHAO chaotic and noisy, FM frequency-modulation surfaces, FOLD wavefolders, BITS digital and stepped, CHEB Chebyshev curves (clean harmonic series).</dd></div>
+    <div><dt>TERR</dt><dd>Picks the land inside the bank and morphs smoothly from one to the next. Its name is shown top right on the map, the bank top left.</dd></div>
+    <div><dt>WARP</dt><dd>Folds the height back on itself through a sine wave. A little adds harmonics; a lot makes it hard and metallic.</dd></div>
+    <div><dt>POSX / POSY</dt><dd>Where the path sits on the land: the cross on the map. Moving it changes the timbre, like a wavetable position but in two directions.</dd></div>
+    <div><dt>ZOOM</dt><dd>Size of the path. Small: the point stays on one slope and the sound is simple, close to a sine wave. Large: it crosses many hills and the sound gets rich and bright.</dd></div>
+    <div><dt>MOD</dt><dd>The Y wave pushes the phase of X, like FM between the two axes. The path bends into knots and the tone grows sidebands.</dd></div>
+  </dl>
+  <h3>SYN 2 &nbsp;·&nbsp; the two axes</h3>
+  <dl class="feat">
+    <div><dt>TUNX / TUNY</dt><dd>Pitch of each axis against the note, in semitones. The same pitch draws a line or an ellipse; an octave apart a figure of eight; other intervals give inharmonic, bell-like tones.</dd></div>
+    <div><dt>WAVX / WAVY</dt><dd>The wave that moves the point along that axis: SIN glides, TRI goes in straight lines, SQR jumps between two places, SAW sweeps one way and snaps back.</dd></div>
+    <div><dt>PHSX / PHSY</dt><dd>Phase offset of each axis. With equal tunes it opens a line into an ellipse or a circle, so the point reads a different part of the land.</dd></div>
+    <div><dt>PDX / PDY</dt><dd>Phase distortion, Casio CZ style: squeezes the wave towards one side (the sign chooses which). Brighter, with a resonant edge as you turn it.</dd></div>
+  </dl>
+  <h3>SYN 3 &nbsp;·&nbsp; shaping the land</h3>
+  <dl class="feat">
+    <div><dt>ASPT</dt><dd>Aspect: makes the path wider in X (turn left) or in Y (turn right).</dd></div>
+    <div><dt>ROTA</dt><dd>Rotates the path on the land, from half a turn back to half a turn forward.</dd></div>
+    <div><dt>GRAN</dt><dd>The point jumps from cell to cell instead of gliding. Stepped, lo-fi, bit-crushed tones.</dd></div>
+    <div><dt>CURV</dt><dd>Bends the path towards its edges: positive pushes it out onto the hills, negative pulls it in.</dd></div>
+    <div><dt>ERSN</dt><dd>Erosion: smooths the height that comes out of the land. Darker and softer.</dd></div>
+    <div><dt>RIDG</dt><dd>Ridge: folds the tops into sharp ridges. Brighter, more edges.</dd></div>
+    <div><dt>WIND</dt><dd>Wind: the centre of the path drifts slowly across the land on its own. Movement without an LFO.</dd></div>
+    <div><dt>FDBK</dt><dd>Feedback: the height is sent back into X. From a bit of grit to chaos and noise.</dd></div>
+  </dl>
+  <h3>SYN 4 &nbsp;·&nbsp; drum</h3>
+  <dl class="feat">
+    <div><dt>STIM</dt><dd>Sweep time: how long the pitch drop at the start of each note lasts.</dd></div>
+    <div><dt>SDEP</dt><dd>Sweep depth: how far above the note the pitch starts. At 0 there is no sweep. Kicks, toms, zaps.</dd></div>
+    <div><dt>N.HLD</dt><dd>Noise hold: how long the noise stays at full level before it starts to fade.</dd></div>
+    <div><dt>N.DEC</dt><dd>Noise decay: how fast the noise fades after the hold.</dd></div>
+    <div><dt>BASE</dt><dd>The lowest frequency of the noise filter.</dd></div>
+    <div><dt>WDTH</dt><dd>How wide the noise band is above BASE. Narrow sounds like a tuned hiss, wide like plain noise.</dd></div>
+    <div><dt>GRAN</dt><dd>Grain of the noise: from fine hiss to coarse crackle.</dd></div>
+    <div><dt>N.LEV</dt><dd>How much noise is mixed with the tone. At 0, none.</dd></div>
+  </dl>
+  <h3>SYN 5 &nbsp;·&nbsp; phase, sync and key tracking</h3>
+  <dl class="feat">
+    <div><dt>PHASE X / Y</dt><dd>Fine phase of each axis, from −1.00 to +1.00, for exact settings next to PHSX and PHSY.</dd></div>
+    <div><dt>SYNC X / Y</dt><dd>Hard sync: the axis runs faster, up to 16 times, and restarts at every period of the note. At 0 it is off. Turn it for the classic sync sweep.</dd></div>
+    <div><dt>KEY PHS X / Y</dt><dd>How much the phase of each axis moves with the note you play: higher notes read a different part of the land.</dd></div>
+    <div><dt>KEY PD X / Y</dt><dd>How much the phase distortion follows the note: brighter high notes, or the other way round.</dd></div>
+  </dl>
 
-  <section class="two">
-    <div><h4>Install</h4>
-      <p>Send the .syx like an official OS update (e.g. Elektron Transfer). To go back, send the original OS 1.12.</p></div>
-    <div><h4>Before you do</h4>
-      <p class="warn">Unofficial and experimental, not supported by Elektron. Back up your projects and use it at your own risk.</p></div>
-  </section>
+  <h2 id="build"><span>04</span>Build it</h2>
+  <p>Get <code>Digitone_II_OS1.12.syx</code> from Elektron's website and give it to this page. It is checked, rebuilt and checked again on your computer; nothing is uploaded anywhere. Any other file is refused.</p>
+  <div class="build">
+    <label class="drop" id="drop" for="file">
+      <div class="row"><span class="btn">Choose the .syx</span><span class="hint">or drop it here</span></div>
+    </label>
+    <input type="file" id="file" accept=".syx">
+    <div id="log"><span class="dim">Nothing loaded yet.</span></div>
+    <button class="btn dark" id="dl" disabled>Download the OS</button>
+  </div>
 
-  <canvas class="dith" aria-hidden="true"></canvas>
-  <section id="hood">
-    <div class="sh"><canvas data-text="UNDER THE HOOD"></canvas></div>
-    <dl class="specs">
-      <div class="spec"><dt>Processors</dt><dd>The Digitone II has two brains. A <b>ColdFire MCF54415</b> runs the screen, the buttons, the sequencer and the settings: TERRAIN's pages, NEGATIVE SCREEN, MOD GRAPHICS and the ported mods live here. A <b>SHARC+ ADSP-21569</b> DSP makes the sound: TERRAIN's voices run here, next to Elektron's machines.</dd></div>
-      <div class="spec"><dt>Main OS · ColdFire</dt><dd><b>3,121 KB → 3,354 KB</b> (+233 KB of code and page graphics), out of 4,095 KB available. Our code is added after Elektron's; their functions are only redirected at a few hook points.
-        <div class="meter"><span class="st" style="width:76.2%"></span><span class="ours" style="left:76.2%;width:5.7%"></span></div>
-        <div class="mlab"><span><i style="background:#4a4a4a"></i>Elektron 1.12 <i style="background:var(--hot);margin-left:12px"></i>TERRAIN</span><span>4,095 KB</span></div></dd></div>
-      <div class="spec"><dt>DSP · SHARC</dt><dd><b>817 KB → 900 KB</b> (+83 KB), out of a 1,024 KB DSP image. About 7,600 SHARC instructions for TERRAIN and 2,300 for the voice adapter that plugs it into the stock voice engine.
-        <div class="meter"><span class="st" style="width:79.8%"></span><span class="ours" style="left:79.8%;width:8.1%"></span></div>
-        <div class="mlab"><span><i style="background:#4a4a4a"></i>Elektron 1.12 <i style="background:var(--hot);margin-left:12px"></i>TERRAIN</span><span>1,024 KB</span></div></dd></div>
-      <div class="spec"><dt>DSP load</dt><dd>Sound is made in blocks of 32 samples at 48 kHz, 1,500 blocks a second. Eight TERRAIN voices at once take <b>76%</b> of a block in the emulator, under the 85% line every build is tested against.
-        <div class="meter"><span class="st" style="width:76.3%;background:var(--hot)"></span><span class="line" style="left:85%"></span></div>
-        <div class="mlab"><span>8 voices · 76%</span><span>85% limit</span></div></dd></div>
-      <div class="spec"><dt>Memory</dt><dd>Everything runs from the Digitone's 128 MB of DDR, like the stock OS. NEGATIVE SCREEN and MOD GRAPHICS use <b>2 bytes</b> at the end of the settings block, so they are remembered after a restart.</dd></div>
-      <div class="spec"><dt>Untouched</dt><dd>The bootloader, the updater, the boot data and the file's meta section are <b>byte-identical</b> to Elektron's 1.12. Only the main OS and the DSP image change, so the way back is always a normal OS update.</dd></div>
-      <div class="spec"><dt>Checked</dt><dd>Built with digikit's patchkit, which checks every instruction against what each processor can run. The page then rebuilds both sections from your file, compares them byte for byte with the tested build and runs all <b>22</b> of Elektron's own integrity checks before you can download.</dd></div>
-    </dl>
-  </section>
+  <h2><span>05</span>Install</h2>
+  <p>Send the downloaded file to the Digitone II the way you would send an official OS update, for example with Elektron Transfer. To go back, send the original OS 1.12 file the same way.</p>
+  <p>This is a personal project shared as it is. Elektron did not make it and does not support it. Back up your projects first.</p>
 
+  <h2><span>06</span>Under the hood</h2>
+  <table>
+    <tr><td>Processors</td><td>A ColdFire MCF54415 runs the screen, the keys, the sequencer and the settings; TERRAIN's pages and the mods live there. A SHARC+ ADSP-21569 makes the sound; TERRAIN's voices run there, next to Elektron's machines.</td></tr>
+    <tr><td>Main OS</td><td>3,121 KB → 3,354 KB of 4,095 KB. Our code and page drawings sit after Elektron's code; theirs is only redirected at a few points.
+      <span class="bar" id="bar1"></span></td></tr>
+    <tr><td>DSP</td><td>817 KB → 900 KB of 1,024 KB. About 7,600 SHARC instructions for TERRAIN, 2,300 for the adapter to the stock voice engine.
+      <span class="bar" id="bar2"></span></td></tr>
+    <tr><td>DSP load</td><td>Blocks of 32 samples at 48 kHz. Eight TERRAIN voices take 76% of a block in the emulator; every build is tested against an 85% line.
+      <span class="bar" id="bar3"></span></td></tr>
+    <tr><td>Memory</td><td>The Digitone's 128 MB of DDR, like the stock OS. Negative screen, mod graphics and the intro turn are three bytes at the end of the saved settings.</td></tr>
+    <tr><td>Untouched</td><td>Bootloader, updater, boot data and the file's meta section are byte for byte Elektron's 1.12. Only the main OS and the DSP image change, so a normal OS update always takes you back.</td></tr>
+  </table>
+
+  <h2><span>07</span>Changes</h2>
+  <ul class="log">
+    <li><span>v63c</span><div>FUNC + turn moves TERRAIN's parameters.</div></li>
+    <li><span>v63b</span><div>The three intros take turns; the cursor stays on at the end of GLITCH.</div></li>
+    <li><span>v63a</span><div>First public build. Fonts are read from your own firmware.</div></li>
+  </ul>
 
   <footer>
-    <p><b style="color:var(--text)">blskk</b> · TERRAIN for Digitone II, AGPL-3.0. <a id="src" href="#">Source code</a>.</p>
+    <p>TERRAIN for Digitone II, by blskk (<a href="https://www.instagram.com/emablskk/">@emablskk</a>). AGPL-3.0, <a id="src" href="#">source code</a>.</p>
     <p>Derived from <strong>digikit by Em D - <a href="https://github.com/ElekLabs/digikit">https://github.com/ElekLabs/digikit</a></strong> (modified) and from <a href="https://github.com/angellinares/dn2_firmware_explore">dn2_firmware_explore</a> by angellinares, both AGPL-3.0. Not the original digikit or dnfw.</p>
-    <p>Elektron and Digitone are trademarks of Elektron Music Machines. This project contains no Elektron firmware: it changes your own copy. Some TERRAIN glyphs reproduce the look of the stock Digitone II pages so the machine feels native; they are for owners of the instrument and will be removed on request.</p>
+    <p>Elektron and Digitone are trademarks of Elektron Music Machines. No Elektron firmware is distributed here: the page changes your own copy. Some TERRAIN glyphs reproduce the look of the stock pages so the machine feels native; they will be removed on request.</p>
   </footer>
-</div>
+</main>
 
 <script type="module">
 import { buildFirmware } from "./js/costruisci.js";
+import * as T from "./js/terrain-play.js";
 const PATCH = "patch/patch-v63c.json", OUT = "TERRAIN-dn2-1.12-v63c.syx";
 const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $ = (id) => document.getElementById(id);
-
-// links
+const loadImg = (src) => new Promise((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = ko; i.src = src; });
+const BAYER = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
 const gh = location.hostname.match(/^([^.]+)\.github\.io$/);
 const srcUrl = gh ? `https://github.com/${gh[1]}/${location.pathname.split("/")[1]}` : "https://github.com/";
-$("src").href = srcUrl; $("srcLink").href = srcUrl;
+$("src").href = srcUrl; $("srcTop").href = srcUrl;
 
-// ---------- palette + helpers ----------
-const PAL = [[21,20,18],[34,179,162],[224,57,127],[236,230,216]]; // ink, teal, fuchsia, paper (4 tones, like the GB Camera)
-const BAYER = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
-function loadImg(src) { return new Promise((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = ko; i.src = src; }); }
-
-
-
-// ---------- live wave terrain: TERRAIN's own bank 1 (the same 8 lands as the DSP), scanned by two oscillators ----------
-function oled() {
-  const c = $("scr"), x = c.getContext("2d"), img = x.createImageData(128, 64), d = img.data, PI = Math.PI;
-  const clamp = (v, a) => Math.max(-a, Math.min(a, v));
-  const G = []; for (let i = 0; i < 17 * 17; i++) G.push(Math.random() * 2 - 1); // the noise grid of RUMO
-  function noise(xx, yy) { let u = xx * 4 + 72, v = yy * 4 + 72; const i = Math.floor(u), j = Math.floor(v); u -= i; v -= j;
-    const a = G[(j & 15) * 17 + (i & 15)], b = G[(j & 15) * 17 + (i & 15) + 1], cc = G[((j & 15) + 1) * 17 + (i & 15)], dd = G[((j & 15) + 1) * 17 + (i & 15) + 1];
-    const sx = u * u * (3 - 2 * u), sy = v * v * (3 - 2 * v), hi = a + (b - a) * sx, lo = cc + (dd - cc) * sx; return hi + (lo - hi) * sy; }
-  const LANDS = [ // x, y in -1..1, as in generatori4/terreni.py (bank CLASSIC)
-    (X, Y) => Math.sin(1.5 * PI * X) * Math.cos(.5 * PI * Y),
-    (X, Y) => Math.sin(3 * PI * X) * Math.sin(3 * PI * Y),
-    (X, Y) => Math.sin(5 * PI * X + 3 * PI * Math.sin(2 * PI * Y)),
-    (X, Y) => Math.sin(2 * PI * (X * X + .75 * Y)),
-    (X, Y) => Math.cos(4 * PI * Math.hypot(X - .35, Y - .2)),
-    (X, Y) => clamp(X * X * X - 3 * X * Y * Y, 1),
-    (X, Y) => clamp(2 * X * Y + .3 * X, 1.5) / 1.5,
-    (X, Y) => noise(X, Y),
-  ];
-  // TERR sweeps and crossfades between neighbouring lands, like the knob
-  const land = (X, Y, terr) => { const i = Math.floor(terr) % 8, f = terr - Math.floor(terr), j = (i + 1) % 8;
-    const k = f < .7 ? 0 : (f - .7) / .3; return LANDS[i](X, Y) * (1 - k) + (k ? LANDS[j](X, Y) * k : 0); };
-  const RATIOS = [1, 2, 1.5, 3, 2.5, 1, 4, 1.5];
-  let t = 0;
-  const px = (xx, y, on) => { if (xx < 0 || xx > 127 || y < 0 || y > 63) return; const o = (y * 128 + xx) * 4, v = on ? 236 : 0; d[o] = v; d[o + 1] = v; d[o + 2] = on ? 230 : 0; d[o + 3] = 255; };
-  const LW = 62, LH = 62, SZ = .85;
-  function frame() {
-    const terr = (t * .06) % 8, slot = Math.floor(terr), ratio = RATIOS[slot] + .004 * Math.sin(t * .2);
-    for (let i = 0; i < 128 * 64; i++) px(i & 127, i >> 7, false);
-    // the land, left: height as ordered dither
-    for (let y = 0; y < LH; y++) for (let xx = 0; xx < LW; xx++) {
-      const h = (land(xx / (LW - 1) * 2 - 1, y / (LH - 1) * 2 - 1, terr) + 1) / 2;
-      px(xx + 1, y + 1, h > (BAYER[(y & 3) * 4 + (xx & 3)] + .5) / 16);
-    }
-    // the path: X and Y oscillators (TUNX, TUNY), drawn inverted so it reads on any land; the point is a cross in a black box
-    const ph = t * 2.2, toPx = (v, n) => Math.round((v * SZ + 1) / 2 * (n - 1)), seen = new Set();
-    for (let k = 4; k < 400; k++) {
-      const a = ph - k * .016, qx = toPx(Math.sin(a), LW) + 1, qy = toPx(Math.sin(a * ratio + .7), LH) + 1, key = qy * 128 + qx;
-      if (!seen.has(key)) { seen.add(key); const o = key * 4, on = d[o] > 0; px(qx, qy, !on); }
-    }
-    { const qx = toPx(Math.sin(ph), LW) + 1, qy = toPx(Math.sin(ph * ratio + .7), LH) + 1;
-      for (let i = -3; i <= 3; i++) for (let j = -3; j <= 3; j++) px(qx + i, qy + j, false);
-      for (let i = -2; i <= 2; i++) { px(qx + i, qy, true); px(qx, qy + i, true); } }
-    // frame of the land
-    for (let i = 0; i < 64; i++) { px(i, 0, true); px(i, 63, true); px(0, i, true); px(63, i, true); }
-    // the sound, right: the height under the point, two X cycles
-    let prev = null;
-    for (let k = 0; k < 60; k++) {
-      const a = ph - (59 - k) / 59 * PI * 4, X = Math.sin(a), Y = Math.sin(a * ratio + .7);
-      const z = land(X * SZ, Y * SZ, terr), y = 32 - Math.round(z * 22), xx = 67 + k;
-      if (prev !== null) for (let yy = Math.min(prev, y); yy <= Math.max(prev, y); yy++) px(xx, yy, true); else px(xx, y, true); prev = y;
-    }
-    for (let xx = 67; xx < 127; xx += 3) px(xx, 32, true);
-    // TERR position, bottom right: 8 slots like a page indicator
-    for (let i = 0; i < 8; i++) for (let xx = 0; xx < 5; xx++) for (let y = 0; y < 3; y++) px(70 + i * 7 + xx, 58 + y, i === slot || y === 2);
-    x.putImageData(img, 0, 0);
+const FONT = {
+  A:".###.#...##...#######...##...##...#", B:"####.#...##...#####.#...##...#####.", C:".###.#...##....#....#....#...#.###.",
+  D:"####.#...##...##...##...##...#####.", E:"######....#....####.#....#....#####", G:".###.#...##....#.####...##...#.####",
+  H:"#...##...##...#######...##...##...#", I:".###...#....#....#....#....#...###.", L:"#....#....#....#....#....#....#####",
+  N:"#...##...###..##.#.##..###...##...#", O:".###.#...##...##...##...##...#.###.", P:"####.#...##...#####.#....#....#....",
+  R:"####.#...##...#####.#.#..#..#.#...#", S:".#####....#.....###.....#....#####.", T:"#####..#....#....#....#....#....#..",
+  U:"#...##...##...##...##...##...#.###.", W:"#...##...##...##.#.##.#.##.#..#.#.", Y:"#...##...#.#.#...#....#....#....#..",
+  "'":"..#....#...#.......................", " ":"",
+};
+function stamp(c, text, scale, fit, ink = "#1c1a16") {
+  const chars = [...text], W = chars.length * 6 - 1, H = 7;
+  c.width = W * scale; c.height = H * scale; if (!fit) c.style.width = Math.min(W * scale, 9999) + "px";
+  const x = c.getContext("2d"), cells = [];
+  chars.forEach((k, ci) => { const g = (FONT[k] || "").padEnd(35, "."); for (let r = 0; r < 7; r++) for (let q = 0; q < 5; q++) if (g[r * 5 + q] === "#") cells.push([ci * 6 + q, r]); });
+  function draw(tear) {
+    x.clearRect(0, 0, c.width, c.height); const rows = new Float32Array(H);
+    if (tear) { const y0 = (Math.random() * H) | 0, n = 1 + (Math.random() * 2) | 0, sh = (Math.random() - .5) * 3; for (let y = y0; y < y0 + n && y < H; y++) rows[y] = sh; }
+    const layer = (col, dx) => { x.fillStyle = col; for (const [cx, cy] of cells) x.fillRect(Math.round((cx + rows[cy] + dx) * scale), cy * scale, scale, scale); };
+    if (tear) { layer("#2440c9", -.35); layer("#c8beab", .35); }
+    layer(ink, 0);
   }
-  (function step() { t += 1 / 60; frame(); if (!still) requestAnimationFrame(step); })();
+  draw(false);
+  if (!still) setInterval(() => { if (Math.random() < .12) { draw(true); setTimeout(() => draw(false), 80 + Math.random() * 160); } }, 1600);
 }
 
-// ---------- real pages from the emulator ----------
+
+
+
 async function pages() {
   const sheet = await loadImg("img/oled.png");
   const names = ["SYN 1", "SYN 2", "SYN 3", "DRUM", "PHASE"];
@@ -308,138 +280,130 @@ async function pages() {
     function draw() { x.drawImage(sheet, 0, 64 * (k + 1), 128, 64, 0, 0, 128, 64);
       const d = x.getImageData(0, 0, 128, 64); for (let i = 0; i < d.data.length; i += 4) { let on = d.data[i] > 127; if (neg) on = !on; d.data[i] = d.data[i + 1] = on ? 236 : 0; d.data[i + 2] = on ? 226 : 0; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); }
     draw(); el.onclick = () => { neg = !neg; draw(); };
-    el.append(c); const lab = document.createElement("div"); lab.className = "n"; lab.innerHTML = `<span>${n}</span><span>${k + 1}/5</span>`; el.append(lab); row.append(el);
+    el.append(c); const lab = document.createElement("div"); lab.className = "n"; lab.textContent = n; el.append(lab); row.append(el);
   });
 }
 
-// ---------- pixel stamp font (5x7, drawn here) with occasional tear ----------
-const FONT = {
-  A:".###.#...##...#######...##...##...#", B:"####.#...##...#####.#...##...#####.", C:".###.#...##....#....#....#...#.###.",
-  D:"####.#...##...##...##...##...#####.", E:"######....#....####.#....#....#####", G:".###.#...##....#.####...##...#.####",
-  H:"#...##...##...#######...##...##...#", I:".###...#....#....#....#....#...###.", L:"#....#....#....#....#....#....#####",
-  N:"#...##...###..##.#.##..###...##...#", O:".###.#...##...##...##...##...#.###.", P:"####.#...##...#####.#....#....#....",
-  R:"####.#...##...#####.#.#..#..#.#...#", S:".#####....#.....###.....#....#####.", T:"#####..#....#....#....#....#....#..",
-  U:"#...##...##...##...##...##...#.###.", W:"#...##...##...##.#.##.#.##.#..#.#.", Y:"#...##...#.#.#...#....#....#....#..",
-  "'":"..#....#...#.......................", " ":"",
-};
-function stamp(c, text, scale, fit) {
-  const chars = [...text], W = chars.length * 6 - 1, H = 7;
-  c.width = W * scale; c.height = H * scale; if (!fit) c.style.width = Math.min(W * scale, 9999) + "px";
-  const x = c.getContext("2d"), cells = [];
-  chars.forEach((k, ci) => { const g = (FONT[k] || "").padEnd(35, "."); for (let r = 0; r < 7; r++) for (let q = 0; q < 5; q++) if (g[r * 5 + q] === "#") cells.push([ci * 6 + q, r]); });
-  function draw(tear) {
-    x.clearRect(0, 0, c.width, c.height); const rows = new Float32Array(H);
-    if (tear) { const y0 = (Math.random() * H) | 0, n = 1 + (Math.random() * 2) | 0, sh = (Math.random() - .5) * 3; for (let y = y0; y < y0 + n && y < H; y++) rows[y] = sh; }
-    const layer = (col, dx) => { x.fillStyle = col; for (const [cx, cy] of cells) x.fillRect(Math.round((cx + rows[cy] + dx) * scale), cy * scale, scale, scale); };
-    if (tear) { layer("#5a5a5a", -.35); layer("#ff6a2b", .3); }
-    layer("#f1f1f1", 0);
-  }
-  draw(false);
-  if (!still) setInterval(() => { if (Math.random() < .3) { draw(true); setTimeout(() => draw(false), 80 + Math.random() * 160); } }, 1100);
-}
-function glitchTitle() {
-  stamp($("title"), "TERRAIN", 14, true);
-  document.querySelectorAll(".sh canvas[data-text]").forEach((c) => stamp(c, c.dataset.text, 4, false));
-}
 
-// ---------- background: our own bytes, from the patch ----------
-let patchP = fetch(PATCH).then((r) => r.json());
-async function hexRiver() {
-  const patch = await patchP;
-  let bytes = 0; const pool = [];
-  for (const s of Object.values(patch.sections)) for (const op of s.ops) if (op[0] === "l") { const b = atob(op[1]); bytes += b.length; if (pool.length < 6000) for (let i = 0; i < b.length && pool.length < 6000; i++) pool.push(b.charCodeAt(i)); }
-  $("ours").textContent = (bytes / 1024).toFixed(0) + " KB";
-  const c = $("hexbg"), x = c.getContext("2d"), CW = 21, CH = 15;
-  let cols = 0, rows = 0, cells = [];
-  const tint = () => { const r = Math.random(); return r < .01 ? "rgba(255,106,43,.35)" : r < .03 ? "rgba(255,255,255,.16)" : null; };
-  function size() {
-    const dpr = Math.min(2, devicePixelRatio || 1); c.width = innerWidth * dpr; c.height = innerHeight * dpr; x.setTransform(dpr, 0, 0, dpr, 0, 0);
-    cols = Math.ceil(innerWidth / CW) + 1; rows = Math.ceil(innerHeight / CH) + 1;
-    let k = (Math.random() * pool.length) | 0; cells = [];
-    for (let i = 0; i < cols * rows; i++) cells.push({ b: pool[k++ % pool.length], t: tint() });
-    drawAll();
-  }
-  function cell(i) {
-    const cx = (i % cols) * CW + 3, cy = ((i / cols) | 0) * CH + 11, e = cells[i];
-    x.fillStyle = "#0b0b0b"; x.fillRect(cx - 1, cy - 11, CW, CH);
-    x.fillStyle = e.t || "rgba(255,255,255,.055)"; x.fillText(e.b.toString(16).padStart(2, "0"), cx, cy);
-  }
-  function drawAll() { x.font = "11px ui-monospace, SF Mono, Menlo, monospace"; x.fillStyle = "#0b0b0b"; x.fillRect(0, 0, innerWidth, innerHeight); for (let i = 0; i < cells.length; i++) cell(i); }
-  size(); addEventListener("resize", size);
-  if (still) return;
-  setInterval(() => { // bytes flip, now and then a whole run gets corrupted
-    x.font = "11px ui-monospace, SF Mono, Menlo, monospace";
-    const n = Math.random() < .08 ? 30 + (Math.random() * 60) | 0 : 3;
-    let i = (Math.random() * cells.length) | 0;
-    for (let k = 0; k < n; k++, i = (n > 3 ? i + 1 : (Math.random() * cells.length) | 0) % cells.length) {
-      cells[i].b = n > 3 ? (Math.random() * 256) | 0 : pool[(Math.random() * pool.length) | 0];
-      cells[i].t = n > 3 && Math.random() < .5 ? "rgba(255,255,255,.22)" : tint(); cell(i);
-    }
-  }, 140);
+// usage bars, typed like a manual
+function bar(id, stock, ours, total, limit) {
+  const N = 40, a = Math.round(stock / total * N), b = Math.round((stock + ours) / total * N), l = limit ? Math.round(limit * N) : -1;
+  let s = ""; for (let i = 0; i < N; i++) s += i === l ? "|" : i < a ? "<b>█</b>" : i < b ? "<i>█</i>" : "░";
+  $(id).innerHTML = s;
 }
+bar("bar1", 3121, 233, 4095); bar("bar2", 817, 83, 1024); bar("bar3", 0, 76.3, 100, .85);
 
-// ---------- dithered dividers ----------
-function dividers() {
-  document.querySelectorAll(".dith").forEach((c, n) => {
-    const W = 270, H = 6; c.width = W; c.height = H; const x = c.getContext("2d"), d = x.createImageData(W, H);
-    for (let y = 0; y < H; y++) for (let i = 0; i < W; i++) {
-      const v = (Math.sin(i / 23 + n * 2) * .5 + .5) * (1 - y / H) * .9; const on = v > (BAYER[(y & 3) * 4 + (i & 3)] + .5) / 16;
-      const p = on ? (i % 90 < 60 ? [70,70,70] : [241,241,241]) : null, o = (y * W + i) * 4;
-      if (p) { d.data[o] = p[0]; d.data[o + 1] = p[1]; d.data[o + 2] = p[2]; d.data[o + 3] = 255; }
-    }
-    x.putImageData(d, 0, 0);
+
+// ---------- FIG. 1: TERRAIN, playable ----------
+async function playable() {
+  await T.loadLands("img/lands.bin");
+  const vals = {}; for (const k of T.KNOBS) vals[k.id] = k.def;
+  const c = $("scr"), x = c.getContext("2d"), img = x.createImageData(128, 64), G = new Uint8Array(128 * 64);
+  let ctx = null, node = null, held = null, oct = 0;
+  function draw() {
+    T.render(G, T.words(vals));
+    for (let i = 0; i < G.length; i++) { const o = i * 4, v = G[i] ? 236 : 0; img.data[o] = v; img.data[o + 1] = v; img.data[o + 2] = G[i] ? 230 : 0; img.data[o + 3] = 255; }
+    x.putImageData(img, 0, 0);
+    if (node) node.port.postMessage({ k: T.voiceParams(T.words(vals)) });
+  }
+  let pending = false; const redraw = () => { if (!pending) { pending = true; requestAnimationFrame(() => { pending = false; draw(); }); } };
+  // knobs
+  const box = $("knobs"), ui = {};
+  T.KNOBS.forEach((k, i) => {
+    const el = document.createElement("div"); el.className = "knob" + (i >= 8 ? " row2" : "");
+    el.innerHTML = `<div class="dial"><i></i></div><div class="l">${k.lab}</div><div class="v"></div>`;
+    box.append(el); ui[k.id] = el;
+    const set = (v) => { vals[k.id] = Math.max(k.min, Math.min(k.max, v)); show(k); redraw(); };
+    let y0 = 0, v0 = 0;
+    el.addEventListener("pointerdown", (e) => { el.setPointerCapture(e.pointerId); y0 = e.clientY; v0 = vals[k.id]; });
+    el.addEventListener("pointermove", (e) => { if (!el.hasPointerCapture(e.pointerId)) return; set(v0 + Math.round((y0 - e.clientY) / 3) * k.step); });
+    el.addEventListener("wheel", (e) => { e.preventDefault(); set(vals[k.id] + (e.deltaY < 0 ? k.step : -k.step)); }, { passive: false });
+    el.addEventListener("dblclick", () => set(k.def));
   });
-}
-
-// ---------- screen bursts: a broken display, now and then ----------
-function bursts() {
-  if (still) return;
-  const c = $("burst"), x = c.getContext("2d"), S = 4;
-  function size() { c.width = Math.ceil(innerWidth / S); c.height = Math.ceil(innerHeight / S); }
-  size(); addEventListener("resize", size);
-  function burst() {
-    const cols = ["rgba(241,241,241,.8)", "rgba(120,120,120,.8)", "rgba(241,241,241,.5)", "rgba(255,106,43,.85)"];
-    const cx = Math.random() * c.width, cy = Math.random() * c.height, n = 3 + (Math.random() * 9) | 0;
-    let frames = 2 + (Math.random() * 4) | 0;
-    (function f() {
-      x.clearRect(0, 0, c.width, c.height);
-      if (frames-- <= 0) return;
-      for (let k = 0; k < n; k++) {
-        x.fillStyle = cols[(Math.random() * cols.length) | 0];
-        const w = 2 + (Math.random() * 40) | 0, h = 1 + (Math.random() * 3) | 0;
-        x.fillRect((cx + (Math.random() - .5) * 60) | 0, (cy + (Math.random() - .5) * 30) | 0, w, h);
-      }
-      setTimeout(f, 50);
-    })();
-    setTimeout(burst, 3000 + Math.random() * 6000);
+  function show(k) { const el = ui[k.id], f = (vals[k.id] - k.min) / (k.max - k.min); el.querySelector("i").style.transform = `rotate(${-135 + 270 * f}deg)`; el.querySelector(".v").textContent = T.shown(k, vals[k.id]); }
+  T.KNOBS.forEach(show);
+  // the map: drag the cursor
+  const fromEvent = (e) => { const r = c.getBoundingClientRect(); return [((e.clientX - r.left) / r.width) * 128, ((e.clientY - r.top) / r.height) * 64]; };
+  c.addEventListener("pointerdown", (e) => { c.setPointerCapture(e.pointerId); move(e); });
+  c.addEventListener("pointermove", (e) => { if (c.hasPointerCapture(e.pointerId)) move(e); });
+  function move(e) { const [px, py] = fromEvent(e); if (py > 32) return; const [wx, wy] = T.posFromPixel(px, py); vals.posx = wx; vals.posy = wy; show(T.KNOBS[4]); show(T.KNOBS[5]); redraw(); }
+  // sound
+  async function audio() {
+    if (ctx) return;
+    ctx = new AudioContext();
+    await ctx.audioWorklet.addModule("js/terrain-voice.js");
+    node = new AudioWorkletNode(ctx, "terrain-voice", { outputChannelCount: [2] });
+    node.connect(ctx.destination);
+    node.port.postMessage({ lands: (await (await fetch("img/lands.bin")).arrayBuffer()) });
+    draw();
   }
-  setTimeout(burst, 1500);
+  const freq = (n) => 440 * Math.pow(2, (n + T.tuneSemi(vals.tune) - 69) / 12);
+  async function on(n) { await audio(); held = n; node.port.postMessage({ on: 1, freq: freq(n) }); paint(); }
+  function off(n) { if (held !== n) return; held = null; if (node) node.port.postMessage({ on: 0 }); paint(); }
+  // keys: C3..C4, A..K on the computer keyboard, Z/X octave
+  const kb = $("kbd"), WHITE = [0, 2, 4, 5, 7, 9, 11, 12], BLACK = [1, 3, 6, 8, 10], keys = {};
+  const ww = 100 / WHITE.length;
+  WHITE.forEach((s, i) => { const d = document.createElement("div"); d.className = "w"; d.style.left = i * ww + "%"; d.style.width = ww + "%"; kb.append(d); keys[s] = d; });
+  const bpos = { 1: 1, 3: 2, 6: 4, 8: 5, 10: 6 };
+  BLACK.forEach((s) => { const d = document.createElement("div"); d.className = "b"; d.style.left = (bpos[s] * ww - ww * 0.3) + "%"; d.style.width = ww * 0.6 + "%"; kb.append(d); keys[s] = d; });
+  const octEl = document.createElement("div"); octEl.className = "oct"; kb.append(octEl);
+  const base = () => 48 + 12 * oct;
+  function paint() { for (const s in keys) keys[s].classList.toggle("on", held === base() + +s); octEl.textContent = "C" + (3 + oct); }
+  for (const s in keys) {
+    keys[s].addEventListener("pointerdown", (e) => { e.preventDefault(); on(base() + +s); });
+    keys[s].addEventListener("pointerup", () => off(base() + +s));
+    keys[s].addEventListener("pointerleave", () => off(base() + +s));
+  }
+  const MAP = { a: 0, w: 1, s: 2, e: 3, d: 4, f: 5, t: 6, g: 7, y: 8, h: 9, u: 10, j: 11, k: 12 };
+  addEventListener("keydown", (e) => {
+    if (e.repeat || e.metaKey || e.ctrlKey || e.altKey || /input|textarea/i.test(e.target.tagName)) return;
+    const k = e.key.toLowerCase();
+    if (k === "z") { oct = Math.max(-2, oct - 1); paint(); return; }
+    if (k === "x") { oct = Math.min(2, oct + 1); paint(); return; }
+    if (k in MAP) on(base() + MAP[k]);
+  });
+  addEventListener("keyup", (e) => { const k = e.key.toLowerCase(); if (k in MAP) off(base() + MAP[k]); });
+  paint(); draw();
 }
 
-oled(); pages(); glitchTitle(); hexRiver(); dividers(); bursts();
+// ---------- FIG. 1: the page by itself, slowly wandering through the first bank ----------
+async function hero() {
+  await T.loadLands("img/lands.bin");
+  const c = $("hero"), x = c.getContext("2d"), img = x.createImageData(128, 64), G = new Uint8Array(128 * 64);
+  const vals = {}; for (const k of T.KNOBS) vals[k.id] = k.def;
+  let t = 0;
+  function frame() {
+    t += 1;
+    vals.terr = Math.round(((Math.sin(t / 900) + 1) / 2) * 0x7f00);
+    vals.posx = 0x4000 + Math.round(Math.sin(t / 260) * 0x1800);
+    vals.posy = 0x4000 + Math.round(Math.cos(t / 330) * 0x1400);
+    vals.phsy = 0x4000 + Math.round(Math.sin(t / 500) * 0x2000);
+    vals.mod = Math.round(((Math.sin(t / 700) + 1) / 2) * 0x2800);
+    T.render(G, T.words(vals));
+    for (let i = 0; i < G.length; i++) { const o = i * 4, v = G[i] ? 236 : 0; img.data[o] = v; img.data[o + 1] = v; img.data[o + 2] = G[i] ? 230 : 0; img.data[o + 3] = 255; }
+    x.putImageData(img, 0, 0);
+    if (!still) setTimeout(() => requestAnimationFrame(frame), 50);
+  }
+  frame();
+}
+
+stamp($("mark"), "TERRAIN", 10, true); pages(); hero(); playable();
 
 // ---------- builder ----------
 const logEl = $("log"), dl = $("dl"), drop = $("drop");
+const patchP = fetch(PATCH).then((r) => r.json());
 let result = null;
-function chip(id, st) { $(id).className = "chip " + (st || ""); }
 function log(msg, cls) { const d = document.createElement("div"); if (cls) d.className = cls; d.textContent = msg; logEl.appendChild(d); }
 async function handle(file) {
-  logEl.innerHTML = ''; dl.disabled = true; result = null; ["c1", "c2", "c3", "c4"].forEach((c) => chip(c)); $("checks").textContent = "—";
+  logEl.textContent = ""; dl.disabled = true; result = null;
   try {
-    log(`Reading ${file.name} (${file.size.toLocaleString()} bytes)…`);
+    log(`${file.name}, ${file.size.toLocaleString("en")} bytes`, "dim");
     const raw = new Uint8Array(await file.arrayBuffer());
-    const patch = await patchP;
-    result = await buildFirmware(raw, patch, (s) => {
-      log(s);
-      if (s.includes("recognised")) chip("c1", "ok");
-      if (s.startsWith("Section 3")) chip("c2", "ok");
-      if (s.startsWith("Section 7")) chip("c3", "ok");
-      const m = s.match(/All (\d+) integrity/); if (m) { chip("c4", "ok"); $("checks").textContent = m[1] + " / " + m[1]; }
-    });
+    result = await buildFirmware(raw, await patchP, (s) => log(s));
     log(`Ready: ${OUT}`, "ok");
-    log(`SHA-256 ${result.sha}`);
+    log(`SHA-256 ${result.sha}`, "dim");
     dl.disabled = false;
-  } catch (e) { log(e.message || String(e), "bad"); chip("c1", logEl.textContent.includes("recognised") ? "ok" : "bad"); }
+  } catch (e) { log(e.message || String(e), "bad"); }
 }
 $("file").addEventListener("change", (e) => e.target.files[0] && handle(e.target.files[0]));
 drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
@@ -447,8 +411,7 @@ drop.addEventListener("dragleave", () => drop.classList.remove("over"));
 drop.addEventListener("drop", (e) => { e.preventDefault(); drop.classList.remove("over"); e.dataTransfer.files[0] && handle(e.dataTransfer.files[0]); });
 dl.addEventListener("click", () => {
   if (!result) return;
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([result.syx], { type: "application/octet-stream" }));
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([result.syx], { type: "application/octet-stream" }));
   a.download = OUT; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 });
 </script>
