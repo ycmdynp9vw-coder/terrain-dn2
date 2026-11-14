@@ -1,0 +1,199 @@
+[module]
+id = "em/arpscale"
+version = "0.1.0"
+name = "Arp offsets in scale"
+category = "arp"
+type = "raw"
+author = "em"
+status = "experimental"
+summary = "SETTINGS > PERSONALIZE > ARP OFS IN SCALE: gli OFFSET dei passi dell'arpeggio si muovono per gradi della scala della traccia; [UP] su un passo lo segna per muoversi in semitoni. Porting di arpscale di dn2_firmware_explore. Solo Digitone II 1.11."
+ports = ["dn2-1.12"]
+requires = []
+conflicts = []
+
+[targets]
+"dn2-1.12" = "experimental"
+
+[[object]]
+path = "build/arpscale.dko.json"
+sources = ["src/cf/arpscale.s"]
+place = "cf.expansion"
+
+# cinque jmp (le istruzioni spostate le riesegue il codice)
+[[op]]
+op = "hook"
+hook = "em.arps.arp.hook"
+to = "as_arp"
+[[op]]
+op = "hook"
+hook = "em.arps.menu.hook"
+to = "as_menu_hook"
+[[op]]
+op = "hook"
+hook = "em.arps.load.hook"
+to = "as_load_marks"
+[[op]]
+op = "hook"
+hook = "em.arps.save.hook"
+to = "as_save_marks"
+[[op]]
+op = "hook"
+hook = "em.arps.draw.hook"
+to = "as_draw_step"
+[[op]]
+op = "hook"
+hook = "em.arps.step.hook"
+to = "as_step_key"
+[[op]]
+op = "hook"
+hook = "em.arps.rot.hook"
+to = "as_rotate_marks"
+[[op]]
+op = "hook"
+hook = "em.arps.copy.hook"
+to = "as_copy_marks"
+[[op]]
+op = "hook"
+hook = "em.arps.clear.hook"
+to = "as_clear_marks"
+[[op]]
+op = "hook"
+hook = "em.arps.paste.hook"
+to = "as_paste_marks"
+[[op]]
+op = "hook"
+hook = "em.arps.undo1.hook"
+to = "as_undo_marks"
+[[op]]
+op = "hook"
+hook = "em.arps.undo2.hook"
+to = "as_undo_marks"
+[[claim]]
+resource = "em.arps.arp"
+[[claim]]
+resource = "em.arps.menu"
+[[claim]]
+resource = "em.arps.store"
+[[claim]]
+resource = "em.arps.menu_arp"
+
+# --- siti (firme uniche sull'OS 1.11 di serie, tmp_claude/v59/parole_gen.py) ---
+[[anchor_rule]]
+name = "em.arps.arp"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0xd081d082, 0x600670fe, 0x600270ff]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arps.menu"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x00202e8a, 0x2f0c4e95, 0x2f024e93]
+offset = 10
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arps.load"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x356b0150, 0x01644878, 0x0010486b]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arps.save"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x356b0164, 0x01504878, 0x0010486b]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arps.draw"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4a876612, 0x48780001, 0x2f092f08]
+offset = 0
+len = 8
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arps.step"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4eb94004, 0xbd524fef, 0x00242f0a]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arps.rot"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4eb94004, 0xbde6588f, 0x47f94004]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arps.copy"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4eb94004, 0xcec44fef, 0x00184a00]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arps.clear"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4eb94004, 0xd25e4fef, 0x00144a00]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arps.paste"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4eb94004, 0xd3e04fef, 0x00104a00]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arps.undo1"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x00012f00, 0x4eb94004, 0xd1084fef]
+offset = 4
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arps.undo2"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x00022f00, 0x4eb94004, 0xd1084fef]
+offset = 4
+len = 6
+mark = "D"

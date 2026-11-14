@@ -1,0 +1,95 @@
+[module]
+id = "em/moddest"
+version = "0.1.0"
+name = "More modulation destinations"
+category = "lfo"
+type = "raw"
+author = "em"
+status = "experimental"
+summary = "13 parametri per voce in piu' come destinazioni LFO (ATRG ARST BTRG BRST PHRT KSA KSB1 KSB2, DEL MODE RSET di AMP, PTIM PORT): porting di moddest di dn2_firmware_explore (maschera 0x1e00 nella copia della tabella dei parametri di core/params). Solo Digitone II 1.11."
+ports = ["dn2-1.12"]
+requires = ["core/params"]
+conflicts = []
+
+[targets]
+"dn2-1.12" = "experimental"
+
+# Righe della tabella di serie 0x401f7f94 (1.11), trovate per (gruppo, id) di dnfw con tmp_claude/v59/maschera.py:
+# tutte con maschera 0 di serie e short uguale al nome. 0x1e00 = parametro modulabile ordinario.
+[[entry]]
+registry = "param_masks"
+id = "ptim"
+row = 34
+mask = 0x1e00
+
+[[entry]]
+registry = "param_masks"
+id = "port"
+row = 35
+mask = 0x1e00
+
+[[entry]]
+registry = "param_masks"
+id = "amp_del"
+row = 61
+mask = 0x1e00
+
+[[entry]]
+registry = "param_masks"
+id = "amp_mode"
+row = 73
+mask = 0x1e00
+
+[[entry]]
+registry = "param_masks"
+id = "amp_rset"
+row = 74
+mask = 0x1e00
+
+[[entry]]
+registry = "param_masks"
+id = "atrg"
+row = 221
+mask = 0x1e00
+
+[[entry]]
+registry = "param_masks"
+id = "arst"
+row = 222
+mask = 0x1e00
+
+[[entry]]
+registry = "param_masks"
+id = "btrg"
+row = 224
+mask = 0x1e00
+
+[[entry]]
+registry = "param_masks"
+id = "brst"
+row = 225
+mask = 0x1e00
+
+[[entry]]
+registry = "param_masks"
+id = "phrt"
+row = 226
+mask = 0x1e00
+
+[[entry]]
+registry = "param_masks"
+id = "ksa"
+row = 235
+mask = 0x1e00
+
+[[entry]]
+registry = "param_masks"
+id = "ksb1"
+row = 236
+mask = 0x1e00
+
+[[entry]]
+registry = "param_masks"
+id = "ksb2"
+row = 237
+mask = 0x1e00

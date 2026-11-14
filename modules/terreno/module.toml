@@ -1,0 +1,630 @@
+[module]
+id = "em/terreno"
+version = "3.3.1"
+name = "Terrain"
+category = "machines"
+type = "machine"
+author = "em"
+status = "experimental"
+summary = "(3.3: page 4 phase fine, sync, key track; page 5 drum: pitch sweep and noise as FM DRUM) Terrain synthesis: a point (x, y) runs over a 2-D surface; its height is the sound. Twin X and Y axes (tune, wave, size, center), 8 banks of 8 surfaces (classic, harmonic, edges, chaos, FM, fold, bits, Chebyshev), warp, grain, position, zoom, mod, phase distortion; X and Y phase; land page: aspect, rotation, grain, curve, erosion, ridge, wind, feedback."
+ports = ["dn2-1.12"]
+requires = ["core/dsp-voice", "core/machines", "core/params"]
+conflicts = []
+
+[targets]
+"dn2-1.12" = "experimental"
+
+[[object]]
+path = "build/terreno-dsp.dko.json"
+sources = ["src/dsp/terreno.s"]
+place = "dsp.l2"
+
+[[object]]
+path = "build/terreno-cf.dko.json"
+sources = ["src/module.c"]
+place = "cf.expansion"
+
+# digikit nuovo (13/11): [[machine]] e [[voice]] sono ora DK_MACHINE in src/module.c
+[[entry]]
+registry = "params"
+id = "terreno_tune"
+name = "Tune"
+short = "TUNE"
+template = 0xee
+otpl = 481
+slot = 25
+min = 0x400
+max = 0x7c00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_bank"
+name = "Bank"
+short = "BANK"
+template = 0xd5
+slot = 26
+min = 0x0
+max = 0x700
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_terr"
+name = "Terrain"
+short = "TERR"
+template = 0xd5
+slot = 27
+min = 0x0
+max = 0x7f00
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_warp"
+name = "Warp"
+short = "WARP"
+template = 0xd5
+slot = 28
+min = 0x0
+max = 0x7f00
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_posx"
+name = "Position X"
+short = "POSX"
+template = 0xd5
+slot = 29
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_posy"
+name = "Position Y"
+short = "POSY"
+template = 0xd5
+slot = 30
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_zoom"
+name = "Zoom"
+short = "ZOOM"
+template = 0xd5
+slot = 31
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_mod"
+name = "Mod"
+short = "MOD"
+template = 0xd5
+slot = 32
+min = 0x0
+max = 0x7f00
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_tunx"
+name = "X Tune"
+short = "TUNX"
+template = 0xee
+otpl = 481
+slot = 33
+min = 0x400
+max = 0x7c00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_wavx"
+name = "X Wave"
+short = "WAVX"
+template = 0xd5
+slot = 34
+min = 0x0
+max = 0x300
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_phsx"
+name = "X Phase"
+short = "PHSX"
+template = 0xcf
+slot = 35
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_pdx"
+name = "X Phase Dist"
+short = "PDX"
+template = 0xcf
+slot = 36
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_tuny"
+name = "Y Tune"
+short = "TUNY"
+template = 0xee
+otpl = 481
+slot = 37
+min = 0x400
+max = 0x7c00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_wavy"
+name = "Y Wave"
+short = "WAVY"
+template = 0xd5
+slot = 38
+min = 0x0
+max = 0x300
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_phsy"
+name = "Y Phase"
+short = "PHSY"
+template = 0xcf
+slot = 39
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_pdy"
+name = "Y Phase Dist"
+short = "PDY"
+template = 0xcf
+slot = 40
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_aspt"
+name = "Aspect"
+short = "ASPT"
+template = 0xcf
+slot = 41
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_rota"
+name = "Rotation"
+short = "ROTA"
+template = 0xcf
+slot = 42
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_gran"
+name = "Grain"
+short = "GRAN"
+template = 0xd5
+slot = 43
+min = 0x0
+max = 0x7f00
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_curv"
+name = "Curve"
+short = "CURV"
+template = 0xd5
+slot = 44
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_ersn"
+name = "Erosion"
+short = "ERSN"
+template = 0xd5
+slot = 45
+min = 0x0
+max = 0x7f00
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_ridg"
+name = "Ridge"
+short = "RIDG"
+template = 0xd5
+slot = 46
+min = 0x0
+max = 0x7f00
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_wind"
+name = "Wind"
+short = "WIND"
+template = 0xd5
+slot = 47
+min = 0x0
+max = 0x7f00
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_fdbk"
+name = "Feedback"
+short = "FDBK"
+template = 0xd5
+slot = 48
+min = 0x0
+max = 0x7f00
+default = 0x0
+devices = ["dn2"]
+
+# 3.3 (13/11): pagina 4 (fine fase, SYNC, KEY TRACK) e pagina 5 DRUM (sweep di pitch e rumore come FM DRUM)
+[[entry]]
+registry = "params"
+id = "terreno_pfnx"
+name = "X Phase Fine"
+short = "PFNX"
+template = 0xcf
+slot = 49
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_pfny"
+name = "Y Phase Fine"
+short = "PFNY"
+template = 0xcf
+slot = 50
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_synx"
+name = "X Sync"
+short = "SYNX"
+template = 0xd5
+slot = 51
+min = 0x0
+max = 0x7f00
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_syny"
+name = "Y Sync"
+short = "SYNY"
+template = 0xd5
+slot = 52
+min = 0x0
+max = 0x7f00
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_ptkx"
+name = "X Phase Track"
+short = "PTKX"
+template = 0xcf
+slot = 53
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_ptky"
+name = "Y Phase Track"
+short = "PTKY"
+template = 0xcf
+slot = 54
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_dtkx"
+name = "X PD Track"
+short = "DTKX"
+template = 0xcf
+slot = 55
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_dtky"
+name = "Y PD Track"
+short = "DTKY"
+template = 0xcf
+slot = 56
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_stim"
+name = "Sweep Time"
+short = "STIM"
+template = 0xd5
+slot = 57
+min = 0x0
+max = 0x7f00
+default = 0x2000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_sdep"
+name = "Sweep Depth"
+short = "SDEP"
+template = 0xd5
+slot = 58
+min = 0x0
+max = 0x7f00
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_nhld"
+name = "Noise Hold"
+short = "N.HLD"
+template = 0xd5
+slot = 59
+min = 0x0
+max = 0x7f00
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_ndec"
+name = "Noise Decay"
+short = "N.DEC"
+template = 0xd5
+slot = 60
+min = 0x0
+max = 0x7f00
+default = 0x3000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_base"
+name = "Noise Base"
+short = "BASE"
+template = 0xd5
+slot = 61
+min = 0x0
+max = 0x7f00
+default = 0x3000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_wdth"
+name = "Noise Width"
+short = "WDTH"
+template = 0xd5
+slot = 62
+min = 0x0
+max = 0x7f00
+default = 0x4000
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_ngrn"
+name = "Noise Grain"
+short = "GRAN"
+template = 0xd5
+slot = 63
+min = 0x0
+max = 0x7f00
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "params"
+id = "terreno_nlev"
+name = "Noise Level"
+short = "N.LEV"
+template = 0xd5
+slot = 64
+min = 0x0
+max = 0x7f00
+default = 0x0
+devices = ["dn2"]
+
+[[entry]]
+registry = "pages"
+id = "terreno_syn1"
+machine = "machines.terreno.index"
+name = "SYN1"
+title = "TERRAIN"
+c0 = "params.terreno_tune.index"
+s0 = 25
+c1 = "params.terreno_bank.index"
+s1 = 26
+c2 = "params.terreno_terr.index"
+s2 = 27
+c3 = "params.terreno_warp.index"
+s3 = 28
+c4 = "params.terreno_posx.index"
+s4 = 29
+c5 = "params.terreno_posy.index"
+s5 = 30
+c6 = "params.terreno_zoom.index"
+s6 = 31
+c7 = "params.terreno_mod.index"
+s7 = 32
+devices = ["dn2"]
+
+[[entry]]
+registry = "pages"
+id = "terreno_syn2"
+machine = "machines.terreno.index"
+name = "SYN2"
+title = "TERRAIN"
+c0 = "params.terreno_tunx.index"
+s0 = 33
+c1 = "params.terreno_wavx.index"
+s1 = 34
+c2 = "params.terreno_phsx.index"
+s2 = 35
+c3 = "params.terreno_pdx.index"
+s3 = 36
+c4 = "params.terreno_tuny.index"
+s4 = 37
+c5 = "params.terreno_wavy.index"
+s5 = 38
+c6 = "params.terreno_phsy.index"
+s6 = 39
+c7 = "params.terreno_pdy.index"
+s7 = 40
+devices = ["dn2"]
+
+[[entry]]
+registry = "pages"
+id = "terreno_syn3"
+machine = "machines.terreno.index"
+name = "SYN3"
+title = "TERRAIN"
+c0 = "params.terreno_aspt.index"
+s0 = 41
+c1 = "params.terreno_rota.index"
+s1 = 42
+c2 = "params.terreno_gran.index"
+s2 = 43
+c3 = "params.terreno_curv.index"
+s3 = 44
+c4 = "params.terreno_ersn.index"
+s4 = 45
+c5 = "params.terreno_ridg.index"
+s5 = 46
+c6 = "params.terreno_wind.index"
+s6 = 47
+c7 = "params.terreno_fdbk.index"
+s7 = 48
+devices = ["dn2"]
+
+[[entry]]
+registry = "pages"
+id = "terreno_syn4"
+machine = "machines.terreno.index"
+name = "SYN4"
+title = "TERRAIN"
+c0 = "params.terreno_stim.index"
+s0 = 57
+c1 = "params.terreno_sdep.index"
+s1 = 58
+c2 = "params.terreno_nhld.index"
+s2 = 59
+c3 = "params.terreno_ndec.index"
+s3 = 60
+c4 = "params.terreno_base.index"
+s4 = 61
+c5 = "params.terreno_wdth.index"
+s5 = 62
+c6 = "params.terreno_ngrn.index"
+s6 = 63
+c7 = "params.terreno_nlev.index"
+s7 = 64
+devices = ["dn2"]
+
+[[entry]]
+registry = "pages"
+id = "terreno_syn5"
+machine = "machines.terreno.index"
+name = "SYN5"
+title = "TERRAIN"
+c0 = "params.terreno_pfnx.index"
+s0 = 49
+c1 = "params.terreno_pfny.index"
+s1 = 50
+c2 = "params.terreno_synx.index"
+s2 = 51
+c3 = "params.terreno_syny.index"
+s3 = 52
+c4 = "params.terreno_ptkx.index"
+s4 = 53
+c5 = "params.terreno_ptky.index"
+s5 = 54
+c6 = "params.terreno_dtkx.index"
+s6 = 55
+c7 = "params.terreno_dtky.index"
+s7 = 56
+devices = ["dn2"]

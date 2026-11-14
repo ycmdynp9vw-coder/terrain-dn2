@@ -1,0 +1,221 @@
+[module]
+id = "em/pagine"
+version = "3.14.0"
+name = "Pagine dei motori"
+category = "machines"
+type = "raw"
+author = "em"
+status = "experimental"
+summary = "Le pagine SYN dei quattro motori della fase 3 (TERRENO, PULSAR, AUTOMA, SPETTRO): tre pagine per motore, LEV in stile Elektron, nomi in inglese, disegnate come le bozze approvate (bozze_fase3). Solo interi. Solo Digitone II 1.11."
+ports = ["dn2-1.12"]
+requires = ["core/machines", "core/params", "em/terreno"]
+conflicts = []
+
+[targets]
+"dn2-1.12" = "experimental"
+
+# La pagina SYN dell'1.11 (0x40018118) sceglie il disegno in base al tipo della machine (0x4004b7f2). Le machine aggiunte
+# da digikit con pagine proprie sono il loro tipo (5..15), quindi cadono nel caso "altro" a 0x400182bc:
+#   move.l %d2,-(%sp) ; move.l %a2,-(%sp) ; jsr griglia(pc) ; addq.l #8,%sp   (d2 = canvas, a2 = view).
+# Il gancio sostituisce le prime tre istruzioni (8 byte) con una chiamata a em_syn_hook, che rimette sulla pila view e canvas
+# (l'addq.l #8 a 0x400182c4 li toglie) e salta a em_syn: per i nostri motori disegna la pagina, per tutti gli altri chiama la
+# griglia di serie, quindi le machine di serie restano identiche.
+[[object]]
+path = "build/pagine.dko.json"
+sources = ["src/cf/pagine6.c", "src/cf/gancio.s", "src/cf/menu.s"]
+# pagine6.c include disegno6.c (il disegno, uguale nella prova sul computer), tab6.h (font, tabelle, superfici) e motori6.h
+place = "cf.expansion"
+
+[object.externs]
+em_m_terreno = "machines.terreno.index"
+em_p_terreno_tune = "params.terreno_tune.index"
+em_p_terreno_bank = "params.terreno_bank.index"
+em_p_terreno_terr = "params.terreno_terr.index"
+em_p_terreno_warp = "params.terreno_warp.index"
+em_p_terreno_posx = "params.terreno_posx.index"
+em_p_terreno_posy = "params.terreno_posy.index"
+em_p_terreno_zoom = "params.terreno_zoom.index"
+em_p_terreno_mod = "params.terreno_mod.index"
+em_p_terreno_tunx = "params.terreno_tunx.index"
+em_p_terreno_wavx = "params.terreno_wavx.index"
+em_p_terreno_phsx = "params.terreno_phsx.index"
+em_p_terreno_pdx = "params.terreno_pdx.index"
+em_p_terreno_tuny = "params.terreno_tuny.index"
+em_p_terreno_wavy = "params.terreno_wavy.index"
+em_p_terreno_phsy = "params.terreno_phsy.index"
+em_p_terreno_pdy = "params.terreno_pdy.index"
+em_p_terreno_aspt = "params.terreno_aspt.index"
+em_p_terreno_rota = "params.terreno_rota.index"
+em_p_terreno_gran = "params.terreno_gran.index"
+em_p_terreno_curv = "params.terreno_curv.index"
+em_p_terreno_ersn = "params.terreno_ersn.index"
+em_p_terreno_ridg = "params.terreno_ridg.index"
+em_p_terreno_wind = "params.terreno_wind.index"
+em_p_terreno_fdbk = "params.terreno_fdbk.index"
+em_p_terreno_pfnx = "params.terreno_pfnx.index"
+em_p_terreno_pfny = "params.terreno_pfny.index"
+em_p_terreno_synx = "params.terreno_synx.index"
+em_p_terreno_syny = "params.terreno_syny.index"
+em_p_terreno_ptkx = "params.terreno_ptkx.index"
+em_p_terreno_ptky = "params.terreno_ptky.index"
+em_p_terreno_dtkx = "params.terreno_dtkx.index"
+em_p_terreno_dtky = "params.terreno_dtky.index"
+em_p_terreno_stim = "params.terreno_stim.index"
+em_p_terreno_sdep = "params.terreno_sdep.index"
+em_p_terreno_nhld = "params.terreno_nhld.index"
+em_p_terreno_ndec = "params.terreno_ndec.index"
+em_p_terreno_base = "params.terreno_base.index"
+em_p_terreno_wdth = "params.terreno_wdth.index"
+em_p_terreno_ngrn = "params.terreno_ngrn.index"
+em_p_terreno_nlev = "params.terreno_nlev.index"
+
+[[op]]
+op = "write"
+anchor = "em.syn.griglia"
+offset = 0
+hex = "4eb9000000004e71"
+# digikit nuovo: era hook kind = "call", displaced = "drop" (jsr em_syn_hook; nop)
+[[op.reloc]]
+offset = 2
+type = "cf.32"
+symbol = "em_syn_hook"
+[[claim]]
+resource = "em.syn.griglia"
+
+# 11/11: il gestore dei tasti della pagina SYN passa da em_syn_key (easter egg di TERRENO: FUNC + destra).
+# La vtable della pagina SYN sull'1.11: 0x401d49a8 tasti (0x40016480), +4 0x4018a292, +8 disegno (0x40018118).
+[[op]]
+op = "write"
+cpu = "cf"
+anchor = "em.syn.vtable"
+offset = 0
+value = "em_syn_key"
+width = 4
+
+[[claim]]
+resource = "em.syn.vtable"
+
+[[anchor_rule]]
+name = "em.syn.vtable"
+cpu = "cf"
+kind = "cf_words"
+words = [0x40016480, 0x4018a572, 0x40018118]   # 1.12 (0x4018a292 sulla 1.11)
+
+# 0x400182bc sull'1.11: 2f02 2f0a 4eba f166 | 508f 4cd7 (le parole sono uniche nel MAIN OS)
+[[anchor_rule]]
+name = "em.syn.griglia"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x2f022f0a, 0x4ebaf166, 0x508f4cd7]
+offset = 0
+len = 8
+mark = "D"
+
+# 3.10.1 (13/11): il giro dell'UI chiede se lo schermo e' da ridisegnare (jsr 0x4011d2f4 a 0x4002e464): em_poll
+[[op]]
+op = "hook"
+hook = "em.syn.poll.hook"
+to = "em_poll"
+[[claim]]
+resource = "em.syn.poll"
+
+[[anchor_rule]]
+name = "em.syn.poll"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4eb94011, 0xd5d4588f, 0x4a006774]   # 1.12 (isDirty 0x4011d2f4 sulla 1.11)
+offset = 0
+len = 6
+mark = "D"
+
+# 3.10.2 (13/11): SETTINGS > PERSONALIZE > MOD GRAPHICS (byte 0x405cd8b0, spento di base; menu.s da tmp_claude/v60/gen_menu_pagine.py).
+# 0x40098644 sull'1.11: lea 128(%sp),%sp ; rts, la fine del costruttore di PERSONALIZE (reloadconfirm torna qui dopo il suo
+# movem a 0x4009863e, quindi i due ganci non si toccano): jmp pg_menu_hook
+[[op]]
+op = "hook"
+hook = "em.pg.menu.hook"
+to = "pg_menu_hook"
+[[claim]]
+resource = "em.pg.menu"
+
+[[anchor_rule]]
+name = "em.pg.menu"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4cef7c7c, 0x00184fef, 0x00804e75, 0x4feffff4]
+offset = 6
+len = 6
+mark = "D"
+
+# v62d (13/11): SETTINGS > PERSONALIZE > NEGATIVE SCREEN (byte 0x405ce8b1): chi chiama panel_diff (0x40131fd2 sulla 1.12)
+# chiama neg_panel (menu.s), che inverte il buffer davanti solo mentre panel_diff lo manda al pannello. L'ingresso di
+# panel_diff resta intatto (l'emulatore lo cerca per firma).
+[[op]]
+op = "write"
+anchor = "em.neg.lea"
+offset = 0
+hex = "49f900000000"
+[[op.reloc]]
+offset = 2
+type = "cf.32"
+symbol = "neg_panel"
+[[claim]]
+resource = "em.neg.lea"
+
+[[anchor_rule]]
+name = "em.neg.lea"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x49f94013, 0x1fd24a39, 0x4059e1b8]
+offset = 0
+len = 6
+mark = "D"
+
+[[op]]
+op = "write"
+anchor = "em.neg.jsr1"
+offset = 0
+hex = "4eb900000000"
+[[op.reloc]]
+offset = 2
+type = "cf.32"
+symbol = "neg_panel"
+[[claim]]
+resource = "em.neg.jsr1"
+
+[[anchor_rule]]
+name = "em.neg.jsr1"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4eb94013, 0x1fd24879, 0x4461fafc]
+offset = 0
+len = 6
+mark = "D"
+
+[[op]]
+op = "write"
+anchor = "em.neg.jsr2"
+offset = 0
+hex = "4eb900000000"
+[[op.reloc]]
+offset = 2
+type = "cf.32"
+symbol = "neg_panel"
+[[claim]]
+resource = "em.neg.jsr2"
+
+[[anchor_rule]]
+name = "em.neg.jsr2"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4eb94013, 0x1fd22f07, 0x52aeff8c]
+offset = 0
+len = 6
+mark = "D"
+

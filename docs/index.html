@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TERRAIN for Digitone II — custom OS builder</title>
+<style>
+  :root {
+    --bg: #0b0b0b; --bg2: #121212; --card: #161616; --line: #262626; --text: #f1f1f1; --mute: #8c8c8c; --dim: #555;
+    --hot: #ff6a2b; --teal: #f1f1f1; --fuchsia: #f1f1f1; --amber: #f1f1f1; --green: #6fd38a; --ink: #0b0b0b;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body { margin: 0; color: var(--text); font: 16px/1.6 var(--sans); overflow-x: hidden; }
+  #hexbg { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
+  a { color: inherit; text-decoration-color: var(--hot); text-underline-offset: 3px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  .mono { font-family: var(--mono); }
+  .px { image-rendering: pixelated; image-rendering: crisp-edges; }
+
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; gap: 16px; flex-wrap: wrap; }
+  .mark { font: 700 15px var(--mono); letter-spacing: .08em; }
+  .mark span { font-weight: 500; color: var(--mute); margin-left: 8px; letter-spacing: .14em; font-size: 11px; text-transform: uppercase; }
+  .navr { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border: 1px solid var(--line); border-radius: 4px; background: transparent;
+    font: 600 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; text-decoration: none; color: var(--text); cursor: pointer; transition: border-color .12s, color .12s, background .12s; }
+  .pill:hover { border-color: var(--text); }
+  .pill.hot { background: var(--hot); border-color: var(--hot); color: var(--ink); }
+  .pill.hot:hover { background: #ff7444; }
+  .tagline { font: 600 11px var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--mute); }
+  
+
+  .hero { display: grid; grid-template-columns: .95fr 1.05fr; gap: 56px; align-items: center; padding: 56px 0 70px; position: relative; }
+  .screen { background: #000; border: 1px solid var(--line); border-radius: 6px; padding: 22px; box-shadow: 0 40px 60px -30px rgba(0,0,0,.9), 0 0 0 6px #050505; }
+  .screen canvas { display: block; width: 100%; aspect-ratio: 2/1; }
+  #title { display: block; width: 100%; image-rendering: pixelated; margin: 0 0 18px; }
+  .kicker { font: 600 12px var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--mute); margin: 0 0 14px; }
+  .kicker b { color: var(--hot); font-weight: 600; }
+  .lede { font-size: 18px; max-width: 32em; color: #d9d2c3; }
+  .lede a { font-weight: 600; color: var(--text); }
+  .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
+
+    box-shadow: 0 26px 40px -20px rgba(0,0,0,.9); }
+
+  section { padding: 56px 0; }
+  .dith + section { padding-top: 40px; }
+  .specs { border-top: 1px solid var(--line); background: var(--bg); margin: 0; }
+  .spec { display: grid; grid-template-columns: 220px 1fr; gap: 24px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+  .spec dt { font: 600 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--mute); padding-top: 3px; }
+  .spec dd { margin: 0; color: #d6d6d6; }
+  .spec dd b { color: var(--text); font-weight: 600; }
+  .meter { margin-top: 10px; height: 10px; background: #1b1b1b; position: relative; max-width: 560px; }
+  .meter span { position: absolute; top: 0; bottom: 0; }
+  .meter .st { left: 0; background: #4a4a4a; }
+  .meter .ours { background: var(--hot); }
+  .meter .line { width: 1px; background: var(--text); top: -4px; bottom: -4px; }
+  .mlab { display: flex; justify-content: space-between; max-width: 560px; font: 11px var(--mono); color: var(--mute); margin-top: 6px; }
+  .mlab i { display: inline-block; width: 8px; height: 8px; margin-right: 6px; vertical-align: 0; }
+  .sh canvas { display: block; image-rendering: pixelated; margin-bottom: 12px; }
+  .sub { color: var(--mute); margin: 0 0 26px; max-width: 42em; }
+
+  .pages { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  .page { background: #0a0a09; border: 1px solid var(--line); border-radius: 6px; padding: 8px; cursor: pointer; transition: border-color .15s, transform .15s; }
+  .page:hover { border-color: var(--fuchsia); transform: translateY(-2px); }
+  .page canvas { width: 100%; display: block; aspect-ratio: 2/1; }
+  .page .n { color: var(--mute); font: 600 10px var(--mono); letter-spacing: .12em; margin-top: 7px; display: flex; justify-content: space-between; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .slot { background: var(--bg2); padding: 20px 20px 18px; position: relative; }
+  .slot h3 { margin: 0 0 8px; font: 600 12px var(--sans); letter-spacing: .16em; text-transform: uppercase; display: flex; align-items: center; gap: 9px; }
+  .slot h3 i { width: 6px; height: 6px; display: inline-block; background: var(--text) !important; }
+  .slot p { margin: 0; font-size: 14.5px; color: #c9c2b3; }
+  .slot .k { position: absolute; right: 16px; top: 18px; font: 600 10px var(--mono); letter-spacing: .12em; color: var(--dim); }
+  .slot.big { grid-column: span 2; }
+
+  .builder { background: var(--bg2); border: 1px solid var(--line); border-radius: 8px; padding: 24px; }
+  .bhead { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+  .chips { display: flex; gap: 16px; flex-wrap: wrap; font: 600 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--mute); }
+  .chip i { width: 8px; height: 8px; display: inline-block; margin-right: 7px; background: var(--line); vertical-align: 0; }
+  .chip.ok { color: var(--text); } .chip.ok i { background: var(--green); } .chip.bad { color: var(--hot); } .chip.bad i { background: var(--hot); }
+  .drop { display: block; border: 1px dashed #4a463e; border-radius: 6px; padding: 32px 16px; text-align: center; cursor: pointer; transition: background .15s, border-color .15s; }
+  .drop:hover, .drop.over { border-color: var(--hot); background: #141414; }
+  .drop strong { font: 600 16px var(--sans); }
+  .drop small { display: block; color: var(--mute); margin-top: 4px; font-size: 13px; }
+  input[type=file] { display: none; }
+  .console { margin-top: 14px; background: #0c0c0b; border: 1px solid var(--line); color: #d9d2c3; border-radius: 6px; padding: 14px 16px; font: 13px/1.65 var(--mono); min-height: 64px; white-space: pre-wrap; word-break: break-word; }
+  .console .lbl { color: var(--dim); font-size: 10px; letter-spacing: .16em; display: block; margin-bottom: 4px; }
+  .console .ok { color: #8be0a4; } .console .bad { color: #ff9b7e; }
+  .bar { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; margin-top: 14px; font: 600 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
+  .bar b { color: var(--text); } .bar .sp { flex: 1; }
+  button.build { border: 0; border-radius: 4px; background: var(--hot); color: var(--ink); font: 700 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; padding: 13px 20px; cursor: pointer; }
+  button.build:disabled { background: #2c2925; color: var(--dim); cursor: default; }
+
+
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; max-width: 760px; margin: 0 auto; text-align: center; padding-top: 30px; }
+  .two h4 { font: 700 13px var(--mono); letter-spacing: .12em; text-transform: uppercase; margin: 0 0 8px; }
+  .two p { color: #c9c2b3; margin: 0; }
+  .warn { border-top: 2px solid var(--hot); padding-top: 10px; }
+  .two > div > h4 + p:not(.warn) { border-top: 2px solid var(--line); padding-top: 10px; }
+  footer { padding: 40px 0 60px; color: var(--mute); font-size: 13px; border-top: 1px solid var(--line); margin-top: 20px; }
+  footer p { margin: 6px 0; max-width: 62em; }
+  #burst { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 50; image-rendering: pixelated; }
+  .dith { display: block; width: 100%; height: 18px; image-rendering: pixelated; margin: 8px 0 0; }
+
+  @media (max-width: 860px) {
+    .spec { grid-template-columns: 1fr; gap: 6px; }
+    .hero { grid-template-columns: 1fr; }
+    .screen { order: -1; }
+    .pages { grid-template-columns: repeat(2, 1fr); }
+    .grid { grid-template-columns: 1fr; } .slot.big { grid-column: auto; }
+    .two { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { .page:hover { transform: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="mark">blskk<span>/ terrain</span></div>
+    <div class="navr">
+      <span class="tagline"><span class="t">DIGITONE II</span> · <span class="f">OS 1.12</span> · <span class="a" id="ver">V63B</span></span>
+      <a class="pill" id="srcLink" href="#">Source</a>
+      <a class="pill hot" href="#build">Build</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <canvas id="title" aria-label="TERRAIN"></canvas>
+      <h1 style="position:absolute;left:-9999px">TERRAIN for Digitone II</h1>
+      <p class="lede">Unofficial custom OS for the Elektron Digitone II, with a <a href="#inside">new synth machine</a>. Built in your browser from your own OS 1.12 file, which never leaves your computer.</p>
+      <div class="hero-cta">
+        <a class="pill hot" href="#build">Build firmware .syx</a>
+        <a class="pill" href="#pages">See the pages</a>
+      </div>
+    </div>
+    <div class="screen" aria-hidden="true"><canvas id="scr" width="128" height="64" class="px"></canvas></div>
+  </header>
+</div>
+
+<canvas id="hexbg" aria-hidden="true"></canvas>
+<canvas id="burst" aria-hidden="true"></canvas>
+
+<div class="wrap">
+  <section id="inside">
+    <div class="sh"><canvas data-text="WHAT'S INSIDE"></canvas></div>
+    <div class="grid">
+      <div class="slot big"><h3><i style="background:var(--green)"></i>TERRAIN</h3>
+        <p>Wave terrain synthesis. 8 banks of 8 lands, warp, an FM-style MOD, phase distortion, land shaping (aspect, rotation, erosion, ridge, wind, feedback), a DRUM page with pitch sweep and filtered noise, sync and key tracking. Right below SWARMER.</p></div>
+      <div class="slot"><h3><i style="background:var(--teal)"></i>Five native pages</h3>
+        <p>Press an encoder to see the exact value.</p></div>
+      <div class="slot"><h3><i style="background:var(--fuchsia)"></i>NEGATIVE SCREEN</h3>
+        <p>PERSONALIZE › inverted display. P-locks still show up the right way round.</p></div>
+      <div class="slot"><h3><i style="background:var(--amber)"></i>MOD GRAPHICS</h3>
+        <p>TERRAIN's graphics glide to the new value when you turn, randomise or FUNC + turn.</p></div>
+      <div class="slot"><h3><i style="background:var(--hot)"></i>Boot animations</h3>
+        <p>Three new intros at power-on: GLITCH, RITO and FOURIER.</p></div>
+      <div class="slot big" style="grid-column:1/-1"><h3><i style="background:var(--text)"></i>Community mods</h3>
+        <p>Ported from <a href="https://github.com/angellinares/dn2_firmware_explore">dn2_firmware_explore</a>: more LFO destinations (FX and voice parameters), LFO ONE/HALF that hold their value, arpeggiator on MIDI tracks, SHUF and RAND arp modes, arp offsets in scale, MIDI out of audio tracks, reload confirm.</p></div>
+    </div>
+  </section>
+
+  <canvas class="dith" aria-hidden="true"></canvas>
+  <section id="pages">
+    <div class="sh"><canvas data-text="THE PAGES"></canvas></div>
+    <div class="pages" id="pagesRow"></div>
+  </section>
+
+
+  <canvas class="dith" aria-hidden="true"></canvas>
+  <section id="build">
+    <div class="builder">
+      <div class="bhead">
+        <div><div class="sh"><canvas data-text="BUILD YOUR OS"></canvas></div></div>
+        <div class="chips"><span class="chip" id="c1"><i></i>OS 1.12</span><span class="chip" id="c2"><i></i>main OS</span><span class="chip" id="c3"><i></i>DSP</span><span class="chip" id="c4"><i></i>integrity</span></div>
+      </div>
+      <label class="drop" id="drop" for="file"><strong>Drop Digitone_II_OS1.12.syx</strong></label>
+      <input type="file" id="file" accept=".syx">
+      <div class="console" id="log">Waiting for your file.</div>
+      <div class="bar"><span>Our bytes <b id="ours">—</b></span><span>Checks <b id="checks">—</b></span><span class="sp"></span>
+        <button class="build" id="dl" disabled>Download .syx</button></div>
+    </div>
+  </section>
+
+  <section class="two">
+    <div><h4>Install</h4>
+      <p>Send the .syx like an official OS update (e.g. Elektron Transfer). To go back, send the original OS 1.12.</p></div>
+    <div><h4>Before you do</h4>
+      <p class="warn">Unofficial and experimental, not supported by Elektron. Back up your projects and use it at your own risk.</p></div>
+  </section>
+
+  <canvas class="dith" aria-hidden="true"></canvas>
+  <section id="hood">
+    <div class="sh"><canvas data-text="UNDER THE HOOD"></canvas></div>
+    <dl class="specs">
+      <div class="spec"><dt>Processors</dt><dd>The Digitone II has two brains. A <b>ColdFire MCF54415</b> runs the screen, the buttons, the sequencer and the settings: TERRAIN's pages, NEGATIVE SCREEN, MOD GRAPHICS and the ported mods live here. A <b>SHARC+ ADSP-21569</b> DSP makes the sound: TERRAIN's voices run here, next to Elektron's machines.</dd></div>
+      <div class="spec"><dt>Main OS · ColdFire</dt><dd><b>3,121 KB → 3,354 KB</b> (+233 KB of code and page graphics), out of 4,095 KB available. Our code is added after Elektron's; their functions are only redirected at a few hook points.
+        <div class="meter"><span class="st" style="width:76.2%"></span><span class="ours" style="left:76.2%;width:5.7%"></span></div>
+        <div class="mlab"><span><i style="background:#4a4a4a"></i>Elektron 1.12 <i style="background:var(--hot);margin-left:12px"></i>TERRAIN</span><span>4,095 KB</span></div></dd></div>
+      <div class="spec"><dt>DSP · SHARC</dt><dd><b>817 KB → 900 KB</b> (+83 KB), out of a 1,024 KB DSP image. About 7,600 SHARC instructions for TERRAIN and 2,300 for the voice adapter that plugs it into the stock voice engine.
+        <div class="meter"><span class="st" style="width:79.8%"></span><span class="ours" style="left:79.8%;width:8.1%"></span></div>
+        <div class="mlab"><span><i style="background:#4a4a4a"></i>Elektron 1.12 <i style="background:var(--hot);margin-left:12px"></i>TERRAIN</span><span>1,024 KB</span></div></dd></div>
+      <div class="spec"><dt>DSP load</dt><dd>Sound is made in blocks of 32 samples at 48 kHz, 1,500 blocks a second. Eight TERRAIN voices at once take <b>76%</b> of a block in the emulator, under the 85% line every build is tested against.
+        <div class="meter"><span class="st" style="width:76.3%;background:var(--hot)"></span><span class="line" style="left:85%"></span></div>
+        <div class="mlab"><span>8 voices · 76%</span><span>85% limit</span></div></dd></div>
+      <div class="spec"><dt>Memory</dt><dd>Everything runs from the Digitone's 128 MB of DDR, like the stock OS. NEGATIVE SCREEN and MOD GRAPHICS use <b>2 bytes</b> at the end of the settings block, so they are remembered after a restart.</dd></div>
+      <div class="spec"><dt>Untouched</dt><dd>The bootloader, the updater, the boot data and the file's meta section are <b>byte-identical</b> to Elektron's 1.12. Only the main OS and the DSP image change, so the way back is always a normal OS update.</dd></div>
+      <div class="spec"><dt>Checked</dt><dd>Built with digikit's patchkit, which checks every instruction against what each processor can run. The page then rebuilds both sections from your file, compares them byte for byte with the tested build and runs all <b>22</b> of Elektron's own integrity checks before you can download.</dd></div>
+    </dl>
+  </section>
+
+
+  <footer>
+    <p><b style="color:var(--text)">blskk</b> · TERRAIN for Digitone II, AGPL-3.0. <a id="src" href="#">Source code</a>.</p>
+    <p>Derived from <strong>digikit by Em D - <a href="https://github.com/ElekLabs/digikit">https://github.com/ElekLabs/digikit</a></strong> (modified) and from <a href="https://github.com/angellinares/dn2_firmware_explore">dn2_firmware_explore</a> by angellinares, both AGPL-3.0. Not the original digikit or dnfw.</p>
+    <p>Elektron and Digitone are trademarks of Elektron Music Machines. This project contains no Elektron firmware: it changes your own copy. Some TERRAIN glyphs reproduce the look of the stock Digitone II pages so the machine feels native; they are for owners of the instrument and will be removed on request.</p>
+  </footer>
+</div>
+
+<script type="module">
+import { buildFirmware } from "./js/costruisci.js";
+const PATCH = "patch/patch-v63b.json", OUT = "TERRAIN-dn2-1.12-v63b.syx";
+const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = (id) => document.getElementById(id);
+
+// links
+const gh = location.hostname.match(/^([^.]+)\.github\.io$/);
+const srcUrl = gh ? `https://github.com/${gh[1]}/${location.pathname.split("/")[1]}` : "https://github.com/";
+$("src").href = srcUrl; $("srcLink").href = srcUrl;
+
+// ---------- palette + helpers ----------
+const PAL = [[21,20,18],[34,179,162],[224,57,127],[236,230,216]]; // ink, teal, fuchsia, paper (4 tones, like the GB Camera)
+const BAYER = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+function loadImg(src) { return new Promise((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = ko; i.src = src; }); }
+
+
+
+// ---------- live wave terrain: TERRAIN's own bank 1 (the same 8 lands as the DSP), scanned by two oscillators ----------
+function oled() {
+  const c = $("scr"), x = c.getContext("2d"), img = x.createImageData(128, 64), d = img.data, PI = Math.PI;
+  const clamp = (v, a) => Math.max(-a, Math.min(a, v));
+  const G = []; for (let i = 0; i < 17 * 17; i++) G.push(Math.random() * 2 - 1); // the noise grid of RUMO
+  function noise(xx, yy) { let u = xx * 4 + 72, v = yy * 4 + 72; const i = Math.floor(u), j = Math.floor(v); u -= i; v -= j;
+    const a = G[(j & 15) * 17 + (i & 15)], b = G[(j & 15) * 17 + (i & 15) + 1], cc = G[((j & 15) + 1) * 17 + (i & 15)], dd = G[((j & 15) + 1) * 17 + (i & 15) + 1];
+    const sx = u * u * (3 - 2 * u), sy = v * v * (3 - 2 * v), hi = a + (b - a) * sx, lo = cc + (dd - cc) * sx; return hi + (lo - hi) * sy; }
+  const LANDS = [ // x, y in -1..1, as in generatori4/terreni.py (bank CLASSIC)
+    (X, Y) => Math.sin(1.5 * PI * X) * Math.cos(.5 * PI * Y),
+    (X, Y) => Math.sin(3 * PI * X) * Math.sin(3 * PI * Y),
+    (X, Y) => Math.sin(5 * PI * X + 3 * PI * Math.sin(2 * PI * Y)),
+    (X, Y) => Math.sin(2 * PI * (X * X + .75 * Y)),
+    (X, Y) => Math.cos(4 * PI * Math.hypot(X - .35, Y - .2)),
+    (X, Y) => clamp(X * X * X - 3 * X * Y * Y, 1),
+    (X, Y) => clamp(2 * X * Y + .3 * X, 1.5) / 1.5,
+    (X, Y) => noise(X, Y),
+  ];
+  // TERR sweeps and crossfades between neighbouring lands, like the knob
+  const land = (X, Y, terr) => { const i = Math.floor(terr) % 8, f = terr - Math.floor(terr), j = (i + 1) % 8;
+    const k = f < .7 ? 0 : (f - .7) / .3; return LANDS[i](X, Y) * (1 - k) + (k ? LANDS[j](X, Y) * k : 0); };
+  const RATIOS = [1, 2, 1.5, 3, 2.5, 1, 4, 1.5];
+  let t = 0;
+  const px = (xx, y, on) => { if (xx < 0 || xx > 127 || y < 0 || y > 63) return; const o = (y * 128 + xx) * 4, v = on ? 236 : 0; d[o] = v; d[o + 1] = v; d[o + 2] = on ? 230 : 0; d[o + 3] = 255; };
+  const LW = 62, LH = 62, SZ = .85;
+  function frame() {
+    const terr = (t * .06) % 8, slot = Math.floor(terr), ratio = RATIOS[slot] + .004 * Math.sin(t * .2);
+    for (let i = 0; i < 128 * 64; i++) px(i & 127, i >> 7, false);
+    // the land, left: height as ordered dither
+    for (let y = 0; y < LH; y++) for (let xx = 0; xx < LW; xx++) {
+      const h = (land(xx / (LW - 1) * 2 - 1, y / (LH - 1) * 2 - 1, terr) + 1) / 2;
+      px(xx + 1, y + 1, h > (BAYER[(y & 3) * 4 + (xx & 3)] + .5) / 16);
+    }
+    // the path: X and Y oscillators (TUNX, TUNY), drawn inverted so it reads on any land; the point is a cross in a black box
+    const ph = t * 2.2, toPx = (v, n) => Math.round((v * SZ + 1) / 2 * (n - 1)), seen = new Set();
+    for (let k = 4; k < 400; k++) {
+      const a = ph - k * .016, qx = toPx(Math.sin(a), LW) + 1, qy = toPx(Math.sin(a * ratio + .7), LH) + 1, key = qy * 128 + qx;
+      if (!seen.has(key)) { seen.add(key); const o = key * 4, on = d[o] > 0; px(qx, qy, !on); }
+    }
+    { const qx = toPx(Math.sin(ph), LW) + 1, qy = toPx(Math.sin(ph * ratio + .7), LH) + 1;
+      for (let i = -3; i <= 3; i++) for (let j = -3; j <= 3; j++) px(qx + i, qy + j, false);
+      for (let i = -2; i <= 2; i++) { px(qx + i, qy, true); px(qx, qy + i, true); } }
+    // frame of the land
+    for (let i = 0; i < 64; i++) { px(i, 0, true); px(i, 63, true); px(0, i, true); px(63, i, true); }
+    // the sound, right: the height under the point, two X cycles
+    let prev = null;
+    for (let k = 0; k < 60; k++) {
+      const a = ph - (59 - k) / 59 * PI * 4, X = Math.sin(a), Y = Math.sin(a * ratio + .7);
+      const z = land(X * SZ, Y * SZ, terr), y = 32 - Math.round(z * 22), xx = 67 + k;
+      if (prev !== null) for (let yy = Math.min(prev, y); yy <= Math.max(prev, y); yy++) px(xx, yy, true); else px(xx, y, true); prev = y;
+    }
+    for (let xx = 67; xx < 127; xx += 3) px(xx, 32, true);
+    // TERR position, bottom right: 8 slots like a page indicator
+    for (let i = 0; i < 8; i++) for (let xx = 0; xx < 5; xx++) for (let y = 0; y < 3; y++) px(70 + i * 7 + xx, 58 + y, i === slot || y === 2);
+    x.putImageData(img, 0, 0);
+  }
+  (function step() { t += 1 / 60; frame(); if (!still) requestAnimationFrame(step); })();
+}
+
+// ---------- real pages from the emulator ----------
+async function pages() {
+  const sheet = await loadImg("img/oled.png");
+  const names = ["SYN 1", "SYN 2", "SYN 3", "DRUM", "PHASE"];
+  const row = $("pagesRow");
+  names.forEach((n, k) => {
+    const el = document.createElement("div"); el.className = "page";
+    const c = document.createElement("canvas"); c.width = 128; c.height = 64; c.className = "px";
+    const x = c.getContext("2d"); let neg = false;
+    function draw() { x.drawImage(sheet, 0, 64 * (k + 1), 128, 64, 0, 0, 128, 64);
+      const d = x.getImageData(0, 0, 128, 64); for (let i = 0; i < d.data.length; i += 4) { let on = d.data[i] > 127; if (neg) on = !on; d.data[i] = d.data[i + 1] = on ? 236 : 0; d.data[i + 2] = on ? 226 : 0; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); }
+    draw(); el.onclick = () => { neg = !neg; draw(); };
+    el.append(c); const lab = document.createElement("div"); lab.className = "n"; lab.innerHTML = `<span>${n}</span><span>${k + 1}/5</span>`; el.append(lab); row.append(el);
+  });
+}
+
+// ---------- pixel stamp font (5x7, drawn here) with occasional tear ----------
+const FONT = {
+  A:".###.#...##...#######...##...##...#", B:"####.#...##...#####.#...##...#####.", C:".###.#...##....#....#....#...#.###.",
+  D:"####.#...##...##...##...##...#####.", E:"######....#....####.#....#....#####", G:".###.#...##....#.####...##...#.####",
+  H:"#...##...##...#######...##...##...#", I:".###...#....#....#....#....#...###.", L:"#....#....#....#....#....#....#####",
+  N:"#...##...###..##.#.##..###...##...#", O:".###.#...##...##...##...##...#.###.", P:"####.#...##...#####.#....#....#....",
+  R:"####.#...##...#####.#.#..#..#.#...#", S:".#####....#.....###.....#....#####.", T:"#####..#....#....#....#....#....#..",
+  U:"#...##...##...##...##...##...#.###.", W:"#...##...##...##.#.##.#.##.#..#.#.", Y:"#...##...#.#.#...#....#....#....#..",
+  "'":"..#....#...#.......................", " ":"",
+};
+function stamp(c, text, scale, fit) {
+  const chars = [...text], W = chars.length * 6 - 1, H = 7;
+  c.width = W * scale; c.height = H * scale; if (!fit) c.style.width = Math.min(W * scale, 9999) + "px";
+  const x = c.getContext("2d"), cells = [];
+  chars.forEach((k, ci) => { const g = (FONT[k] || "").padEnd(35, "."); for (let r = 0; r < 7; r++) for (let q = 0; q < 5; q++) if (g[r * 5 + q] === "#") cells.push([ci * 6 + q, r]); });
+  function draw(tear) {
+    x.clearRect(0, 0, c.width, c.height); const rows = new Float32Array(H);
+    if (tear) { const y0 = (Math.random() * H) | 0, n = 1 + (Math.random() * 2) | 0, sh = (Math.random() - .5) * 3; for (let y = y0; y < y0 + n && y < H; y++) rows[y] = sh; }
+    const layer = (col, dx) => { x.fillStyle = col; for (const [cx, cy] of cells) x.fillRect(Math.round((cx + rows[cy] + dx) * scale), cy * scale, scale, scale); };
+    if (tear) { layer("#5a5a5a", -.35); layer("#ff6a2b", .3); }
+    layer("#f1f1f1", 0);
+  }
+  draw(false);
+  if (!still) setInterval(() => { if (Math.random() < .3) { draw(true); setTimeout(() => draw(false), 80 + Math.random() * 160); } }, 1100);
+}
+function glitchTitle() {
+  stamp($("title"), "TERRAIN", 14, true);
+  document.querySelectorAll(".sh canvas[data-text]").forEach((c) => stamp(c, c.dataset.text, 4, false));
+}
+
+// ---------- background: our own bytes, from the patch ----------
+let patchP = fetch(PATCH).then((r) => r.json());
+async function hexRiver() {
+  const patch = await patchP;
+  let bytes = 0; const pool = [];
+  for (const s of Object.values(patch.sections)) for (const op of s.ops) if (op[0] === "l") { const b = atob(op[1]); bytes += b.length; if (pool.length < 6000) for (let i = 0; i < b.length && pool.length < 6000; i++) pool.push(b.charCodeAt(i)); }
+  $("ours").textContent = (bytes / 1024).toFixed(0) + " KB";
+  const c = $("hexbg"), x = c.getContext("2d"), CW = 21, CH = 15;
+  let cols = 0, rows = 0, cells = [];
+  const tint = () => { const r = Math.random(); return r < .01 ? "rgba(255,106,43,.35)" : r < .03 ? "rgba(255,255,255,.16)" : null; };
+  function size() {
+    const dpr = Math.min(2, devicePixelRatio || 1); c.width = innerWidth * dpr; c.height = innerHeight * dpr; x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cols = Math.ceil(innerWidth / CW) + 1; rows = Math.ceil(innerHeight / CH) + 1;
+    let k = (Math.random() * pool.length) | 0; cells = [];
+    for (let i = 0; i < cols * rows; i++) cells.push({ b: pool[k++ % pool.length], t: tint() });
+    drawAll();
+  }
+  function cell(i) {
+    const cx = (i % cols) * CW + 3, cy = ((i / cols) | 0) * CH + 11, e = cells[i];
+    x.fillStyle = "#0b0b0b"; x.fillRect(cx - 1, cy - 11, CW, CH);
+    x.fillStyle = e.t || "rgba(255,255,255,.055)"; x.fillText(e.b.toString(16).padStart(2, "0"), cx, cy);
+  }
+  function drawAll() { x.font = "11px ui-monospace, SF Mono, Menlo, monospace"; x.fillStyle = "#0b0b0b"; x.fillRect(0, 0, innerWidth, innerHeight); for (let i = 0; i < cells.length; i++) cell(i); }
+  size(); addEventListener("resize", size);
+  if (still) return;
+  setInterval(() => { // bytes flip, now and then a whole run gets corrupted
+    x.font = "11px ui-monospace, SF Mono, Menlo, monospace";
+    const n = Math.random() < .08 ? 30 + (Math.random() * 60) | 0 : 3;
+    let i = (Math.random() * cells.length) | 0;
+    for (let k = 0; k < n; k++, i = (n > 3 ? i + 1 : (Math.random() * cells.length) | 0) % cells.length) {
+      cells[i].b = n > 3 ? (Math.random() * 256) | 0 : pool[(Math.random() * pool.length) | 0];
+      cells[i].t = n > 3 && Math.random() < .5 ? "rgba(255,255,255,.22)" : tint(); cell(i);
+    }
+  }, 140);
+}
+
+// ---------- dithered dividers ----------
+function dividers() {
+  document.querySelectorAll(".dith").forEach((c, n) => {
+    const W = 270, H = 6; c.width = W; c.height = H; const x = c.getContext("2d"), d = x.createImageData(W, H);
+    for (let y = 0; y < H; y++) for (let i = 0; i < W; i++) {
+      const v = (Math.sin(i / 23 + n * 2) * .5 + .5) * (1 - y / H) * .9; const on = v > (BAYER[(y & 3) * 4 + (i & 3)] + .5) / 16;
+      const p = on ? (i % 90 < 60 ? [70,70,70] : [241,241,241]) : null, o = (y * W + i) * 4;
+      if (p) { d.data[o] = p[0]; d.data[o + 1] = p[1]; d.data[o + 2] = p[2]; d.data[o + 3] = 255; }
+    }
+    x.putImageData(d, 0, 0);
+  });
+}
+
+// ---------- screen bursts: a broken display, now and then ----------
+function bursts() {
+  if (still) return;
+  const c = $("burst"), x = c.getContext("2d"), S = 4;
+  function size() { c.width = Math.ceil(innerWidth / S); c.height = Math.ceil(innerHeight / S); }
+  size(); addEventListener("resize", size);
+  function burst() {
+    const cols = ["rgba(241,241,241,.8)", "rgba(120,120,120,.8)", "rgba(241,241,241,.5)", "rgba(255,106,43,.85)"];
+    const cx = Math.random() * c.width, cy = Math.random() * c.height, n = 3 + (Math.random() * 9) | 0;
+    let frames = 2 + (Math.random() * 4) | 0;
+    (function f() {
+      x.clearRect(0, 0, c.width, c.height);
+      if (frames-- <= 0) return;
+      for (let k = 0; k < n; k++) {
+        x.fillStyle = cols[(Math.random() * cols.length) | 0];
+        const w = 2 + (Math.random() * 40) | 0, h = 1 + (Math.random() * 3) | 0;
+        x.fillRect((cx + (Math.random() - .5) * 60) | 0, (cy + (Math.random() - .5) * 30) | 0, w, h);
+      }
+      setTimeout(f, 50);
+    })();
+    setTimeout(burst, 3000 + Math.random() * 6000);
+  }
+  setTimeout(burst, 1500);
+}
+
+oled(); pages(); glitchTitle(); hexRiver(); dividers(); bursts();
+
+// ---------- builder ----------
+const logEl = $("log"), dl = $("dl"), drop = $("drop");
+let result = null;
+function chip(id, st) { $(id).className = "chip " + (st || ""); }
+function log(msg, cls) { const d = document.createElement("div"); if (cls) d.className = cls; d.textContent = msg; logEl.appendChild(d); }
+async function handle(file) {
+  logEl.innerHTML = ''; dl.disabled = true; result = null; ["c1", "c2", "c3", "c4"].forEach((c) => chip(c)); $("checks").textContent = "—";
+  try {
+    log(`Reading ${file.name} (${file.size.toLocaleString()} bytes)…`);
+    const raw = new Uint8Array(await file.arrayBuffer());
+    const patch = await patchP;
+    result = await buildFirmware(raw, patch, (s) => {
+      log(s);
+      if (s.includes("recognised")) chip("c1", "ok");
+      if (s.startsWith("Section 3")) chip("c2", "ok");
+      if (s.startsWith("Section 7")) chip("c3", "ok");
+      const m = s.match(/All (\d+) integrity/); if (m) { chip("c4", "ok"); $("checks").textContent = m[1] + " / " + m[1]; }
+    });
+    log(`Ready: ${OUT}`, "ok");
+    log(`SHA-256 ${result.sha}`);
+    dl.disabled = false;
+  } catch (e) { log(e.message || String(e), "bad"); chip("c1", logEl.textContent.includes("recognised") ? "ok" : "bad"); }
+}
+$("file").addEventListener("change", (e) => e.target.files[0] && handle(e.target.files[0]));
+drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
+drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+drop.addEventListener("drop", (e) => { e.preventDefault(); drop.classList.remove("over"); e.dataTransfer.files[0] && handle(e.dataTransfer.files[0]); });
+dl.addEventListener("click", () => {
+  if (!result) return;
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([result.syx], { type: "application/octet-stream" }));
+  a.download = OUT; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+});
+</script>
+</body>
+</html>

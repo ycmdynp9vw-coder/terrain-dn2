@@ -1,0 +1,142 @@
+[module]
+id = "em/midiarp"
+version = "0.1.0"
+name = "Arpeggiator on MIDI tracks"
+category = "arp"
+type = "raw"
+author = "em"
+status = "experimental"
+summary = "L'arpeggiatore sulle tracce MIDI: il menu ARPEGGIATOR si apre e l'arp suona in MIDI (porting di midiarp di dn2_firmware_explore). Con em/midiout 0.2.1: una copia di TRACK WILL TRIGGER verso una traccia MIDI con l'arp acceso la suona solo l'arp. Solo Digitone II 1.11."
+ports = ["dn2-1.12"]
+requires = []
+conflicts = []
+
+[targets]
+"dn2-1.12" = "experimental"
+
+[[object]]
+path = "build/midiarp.dko.json"
+sources = ["src/cf/midiarp.s"]
+place = "cf.expansion"
+
+# i due bivi del sequencer (mvs.w 23770(%a0),%dN ; btst %d2,%dN, 6 B): jsr ma_seq_gate (traccia MIDI con arp -> synth)
+[[op]]
+op = "write"
+anchor = "em.marp.fork1"
+offset = 0
+hex = "4eb900000000"
+# digikit nuovo: era hook kind = "call", displaced = "drop" (jsr ma_seq_gate; nop)
+[[op.reloc]]
+offset = 2
+type = "cf.32"
+symbol = "ma_seq_gate"
+[[op]]
+op = "write"
+anchor = "em.marp.fork2"
+offset = 0
+hex = "4eb900000000"
+# digikit nuovo: era hook kind = "call", displaced = "drop" (jsr ma_seq_gate; nop)
+[[op.reloc]]
+offset = 2
+type = "cf.32"
+symbol = "ma_seq_gate"
+[[op]]
+op = "hook"
+hook = "em.marp.keydn.hook"
+to = "ma_live_send"
+[[op]]
+op = "hook"
+hook = "em.marp.keyup.hook"
+to = "ma_live_send"
+[[op]]
+op = "hook"
+hook = "em.marp.voice.hook"
+to = "ma_voice_hook"
+[[op]]
+op = "write"
+anchor = "em.marp.menu"
+hex = "4e714e71"
+[[op]]
+op = "write"
+anchor = "em.marp.view"
+hex = "600e"
+
+[[claim]]
+resource = "em.marp.fork"
+[[claim]]
+resource = "em.marp.live"
+[[claim]]
+resource = "em.marp.voice"
+[[claim]]
+resource = "em.marp.menu"
+
+# --- siti (firme uniche sull'OS 1.11 di serie, tmp_claude/v59/parole_gen.py) ---
+[[anchor_rule]]
+name = "em.marp.fork1"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x73685cda, 0x05016626, 0x226f003c]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.marp.fork2"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x71685cda, 0x05006656, 0x4eb94013]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.marp.keydn"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4eb94012, 0xb8b0588f, 0x600000a4]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.marp.keyup"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4eb94012, 0xb8b0588f, 0x2f024eb9]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.marp.voice"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4eb9400d, 0xb524732a, 0x0002508f]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.marp.menu"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x6600f58e, 0x2f024eb9, 0x401160ac]
+offset = 0
+len = 4
+mark = "D"
+
+[[anchor_rule]]
+name = "em.marp.view"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x670e2052, 0x22502f08, 0x20690028]
+offset = 0
+len = 2
+mark = "D"

@@ -1,0 +1,101 @@
+[module]
+id = "em/midiout"
+version = "0.2.1"
+name = "MIDI out dalle tracce audio"
+category = "midi"
+type = "raw"
+author = "em"
+status = "experimental"
+summary = "Le note delle tracce audio in MIDI: (0.2) riga MIDI OUT nel menu SETUP della traccia (OFF, TRIG o una nota fissa, sul canale di TRACK n CHANNEL); (0.1) TRACK WILL TRIGGER verso una traccia MIDI (porting di layermidi di dn2_firmware_explore). (0.2.1) una copia verso una traccia MIDI con arp acceso la lascia a em/midiarp. Solo Digitone II 1.11."
+ports = ["dn2-1.12"]
+requires = []
+conflicts = []
+
+[targets]
+"dn2-1.12" = "experimental"
+
+[[object]]
+path = "build/midiout.dko.json"
+sources = ["src/cf/midiout.s", "src/cf/mout.c"]
+place = "cf.expansion"
+
+# 0x40026980: mvz.w 0x8000537e,%d1 (73f9 8000 537e), testa del corpo per nota dell'ISR dei fotogrammi
+[[op]]
+op = "write"
+anchor = "em.midi.nota"
+offset = 0
+hex = "4eb900000000"
+# digikit nuovo: era hook kind = "call", displaced = "drop" (jsr note_hook; nop)
+[[op.reloc]]
+offset = 2
+type = "cf.32"
+symbol = "note_hook"
+[[op]]
+op = "hook"
+hook = "em.midi.rilascio.hook"
+to = "release_hook"
+[[op]]
+op = "write"
+anchor = "em.mout.menu"
+offset = 0
+hex = "4eb900000000"
+# digikit nuovo: era hook kind = "call", displaced = "drop" (jsr gancio_menu; nop)
+[[op.reloc]]
+offset = 2
+type = "cf.32"
+symbol = "gancio_menu"
+[[op]]
+op = "hook"
+hook = "em.mout.canale.hook"
+to = "mout_chan"
+[[claim]]
+resource = "em.mout.menu"
+
+[[claim]]
+resource = "em.mout.canale"
+
+[[claim]]
+resource = "em.midi.nota"
+
+[[claim]]
+resource = "em.midi.rilascio"
+
+[[anchor_rule]]
+name = "em.midi.nota"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x73f98000, 0x537e41f9, 0x80005380]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.midi.rilascio"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x60d8792a, 0x00022f04, 0x2f280010]
+offset = 2
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.mout.menu"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4cef7cfc, 0x00084fef, 0x00c44e75]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.mout.canale"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x2f027401, 0x202f0008, 0x220041f9, 0x446163c4]
+offset = 0
+len = 8
+mark = "D"

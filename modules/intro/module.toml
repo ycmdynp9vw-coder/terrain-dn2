@@ -1,0 +1,38 @@
+[module]
+id = "em/intro"
+version = "0.2.0"
+name = "Accensione blskk"
+category = "ui"
+type = "raw"
+author = "em"
+status = "experimental"
+summary = "L'animazione di accensione approvata il 3/11/2026: un terminale lancia ./BLSKK.SH (righe e ordine diversi a ogni accensione), la barra si rompe in un glitch ASCII, la sagoma di blskk si solidifica in pixel, poi il cursore lampeggia. Disegnata sopra l'intro di serie (modo ANIM di dn2_firmware_explore). Solo Digitone II 1.11."
+ports = ["dn2-1.12"]
+requires = []
+conflicts = []
+
+[targets]
+"dn2-1.12" = "experimental"
+
+[[object]]
+path = "build/intro.dko.json"
+sources = ["src/cf/intro_hook.s", "src/cf/intro.c"]
+place = "cf.expansion"
+
+# 0x400d3886: lea -60(%sp),%sp ; movem.l %d2-%d7/%a2-%a6,(%sp) (4fef ffc4 48d7 7cfc), ingresso della routine dell'intro
+[[op]]
+op = "hook"
+hook = "em.intro.routine.hook"
+to = "intro_hook"
+[[claim]]
+resource = "em.intro.routine"
+
+[[anchor_rule]]
+name = "em.intro.routine"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4fefffc4, 0x48d77cfc, 0x246f0040, 0x2a2f0048, 0x48780001]
+offset = 0
+len = 8
+mark = "D"

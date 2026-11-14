@@ -1,0 +1,112 @@
+[module]
+id = "em/arpmodes"
+version = "0.1.0"
+name = "Arpeggiator SHUF and RAND"
+category = "arp"
+type = "raw"
+author = "em"
+status = "experimental"
+summary = "Due modi d'arpeggio veri: SHUF (ogni nota una volta per ciclo, in ordine casuale nuovo) e RAND (una nota a caso a ogni passo). Porting di arpmodes di dn2_firmware_explore. Solo Digitone II 1.11."
+ports = ["dn2-1.12"]
+requires = []
+conflicts = []
+
+[targets]
+"dn2-1.12" = "experimental"
+
+[[object]]
+path = "build/arpmodes.dko.json"
+sources = ["src/cf/arpmodes.s"]
+place = "cf.expansion"
+
+# 0x4002a13c (12 B), il passo dell'arpeggio sceglie il modo: jmp arpmodes (rifa' lui DOWN e CYCL)
+[[op]]
+op = "hook"
+hook = "em.arpm.disp.hook"
+to = "arpmodes"
+[[op]]
+op = "write"
+anchor = "em.arpm.b1"
+hex = "7406"
+[[op]]
+op = "write"
+anchor = "em.arpm.b2"
+hex = "7206"
+[[op]]
+op = "write"
+anchor = "em.arpm.b3"
+hex = "7006"
+[[op]]
+op = "write"
+anchor = "em.arpm.b4"
+hex = "7206"
+[[op]]
+op = "write"
+anchor = "em.arpm.b5"
+hex = "7406"
+
+[[claim]]
+resource = "em.arpm.disp"
+[[claim]]
+resource = "em.arpm.bounds"
+
+# --- siti (firme uniche sull'OS 1.11 di serie, tmp_claude/v59/parole_gen.py) ---
+[[anchor_rule]]
+name = "em.arpm.disp"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x7003b084, 0x670000c6, 0x60000144]
+offset = 0
+len = 12
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arpm.b1"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4fef000c, 0x6c044281, 0x60087404]
+offset = 10
+len = 2
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arpm.b2"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x72047401, 0x2040203c, 0x401dddec, 0x1141015f]
+offset = 0
+len = 2
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arpm.b3"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x70047329, 0x0176b081, 0x6d084a81]
+offset = 0
+len = 2
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arpm.b4"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x72041741, 0x015f2052, 0x2f0a2068]
+offset = 0
+len = 2
+mark = "D"
+
+[[anchor_rule]]
+name = "em.arpm.b5"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x7404102b, 0x014b7300, 0xb4816d0e]
+offset = 0
+len = 2
+mark = "D"

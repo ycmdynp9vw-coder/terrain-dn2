@@ -1,0 +1,258 @@
+[module]
+id = "em/fxmod"
+version = "0.1.0"
+name = "LFO modulation of the FX"
+category = "lfo"
+type = "raw"
+author = "em"
+status = "experimental"
+summary = "Un LFO puo' modulare 24 parametri di Chorus, Delay e Reverb (porting di fxmod di dn2_firmware_explore): 24 destinazioni in piu' nella lista DEST, il gruppo Chorus si chiama CHR e non ERR. Solo Digitone II 1.11."
+ports = ["dn2-1.12"]
+requires = ["core/params"]
+conflicts = []
+
+[targets]
+"dn2-1.12" = "experimental"
+
+[[object]]
+path = "build/fxmod.dko.json"
+sources = ["src/cf/fxmod.s"]
+place = "cf.expansion"
+
+# 0x400395b8: moveq #101,%d1 -> #125, il giro dell'elenco 0..100 -> 0..124
+[[op]]
+op = "write"
+anchor = "em.fxm.walk"
+hex = "727d"
+
+# sette `jsr 0x400dbcc4` (voce -> codice DEST) -> fx_code
+[[op]]
+op = "hook"
+hook = "em.fxm.jsr1.hook"
+to = "fx_code"
+[[op]]
+op = "hook"
+hook = "em.fxm.jsr2.hook"
+to = "fx_code"
+[[op]]
+op = "hook"
+hook = "em.fxm.jsr3.hook"
+to = "fx_code"
+[[op]]
+op = "hook"
+hook = "em.fxm.jsr4.hook"
+to = "fx_code"
+[[op]]
+op = "hook"
+hook = "em.fxm.jsr5.hook"
+to = "fx_code"
+[[op]]
+op = "hook"
+hook = "em.fxm.jsr6.hook"
+to = "fx_code"
+[[op]]
+op = "hook"
+hook = "em.fxm.jsr7.hook"
+to = "fx_code"
+[[op]]
+op = "write"
+anchor = "em.fxm.evbound"
+hex = "727f"
+
+# 0x40137a9e (8 B): jmp fx_eval
+[[op]]
+op = "hook"
+hook = "em.fxm.eval.hook"
+to = "fx_eval"
+[[op]]
+op = "hook"
+hook = "em.fxm.slot.hook"
+to = "fx_slot"
+[[op]]
+op = "write"
+anchor = "em.fxm.grp16"
+hex = "40210c34"   # 1.12: 'CHR' (0x4021077c sulla 1.11)
+
+# le dieci righe chiuse: gli otto di Chorus e i due Mix Volume doppi (maschera 0 -> 0x1e00 nella copia di core/params)
+[[entry]]
+registry = "param_masks"
+id = "fx105"
+row = 105
+mask = 0x1e00
+[[entry]]
+registry = "param_masks"
+id = "fx106"
+row = 106
+mask = 0x1e00
+[[entry]]
+registry = "param_masks"
+id = "fx107"
+row = 107
+mask = 0x1e00
+[[entry]]
+registry = "param_masks"
+id = "fx108"
+row = 108
+mask = 0x1e00
+[[entry]]
+registry = "param_masks"
+id = "fx109"
+row = 109
+mask = 0x1e00
+[[entry]]
+registry = "param_masks"
+id = "fx110"
+row = 110
+mask = 0x1e00
+[[entry]]
+registry = "param_masks"
+id = "fx111"
+row = 111
+mask = 0x1e00
+[[entry]]
+registry = "param_masks"
+id = "fx112"
+row = 112
+mask = 0x1e00
+[[entry]]
+registry = "param_masks"
+id = "fx120"
+row = 120
+mask = 0x1e00
+[[entry]]
+registry = "param_masks"
+id = "fx129"
+row = 129
+mask = 0x1e00
+
+[[claim]]
+resource = "em.fxm.walk"
+[[claim]]
+resource = "em.fxm.eval"
+[[claim]]
+resource = "em.fxm.slot"
+[[claim]]
+resource = "em.fxm.grp16"
+[[claim]]
+resource = "em.fxm.jsr"
+
+# --- siti (firme uniche sull'OS 1.11 di serie, tmp_claude/v59/parole_fx.py) ---
+[[anchor_rule]]
+name = "em.fxm.walk"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x7265b282, 0x66cc4a39, 0x405c6dd0]
+offset = 0
+len = 2
+mark = "D"
+
+[[anchor_rule]]
+name = "em.fxm.jsr1"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4eb9400d, 0xbcc4588f, 0x2600e18b]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.fxm.jsr2"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0xfb06486e, 0xfff4206e, 0xfff82f28]
+offset = 90
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.fxm.jsr3"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0xf8e4486e, 0xfff4206e, 0xfff82f28]
+offset = 90
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.fxm.jsr4"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0xf6e6486e, 0xfff4206e, 0xfff82f28]
+offset = 90
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.fxm.jsr5"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4eb9400d, 0xbcc44878, 0x00014878]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.fxm.jsr6"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4eb9400d, 0xbcc4588f, 0xe1886030]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.fxm.jsr7"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4eb9400d, 0xbcc42054, 0x2f002f0c]
+offset = 0
+len = 6
+mark = "D"
+
+[[anchor_rule]]
+name = "em.fxm.evbound"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x72647f42, 0x25470068, 0xb2876538]
+offset = 0
+len = 2
+mark = "D"
+
+[[anchor_rule]]
+name = "em.fxm.eval"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x736c0052, 0x4df07a00, 0x0681ffff]
+offset = 0
+len = 8
+mark = "D"
+
+[[anchor_rule]]
+name = "em.fxm.slot"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x2f027264, 0x206f0008, 0x202f000c]
+offset = 0
+len = 8
+mark = "D"
+
+[[anchor_rule]]
+name = "em.fxm.grp16"
+cpu = "cf"
+kind = "cf_words"
+as = "data"
+words = [0x40210c9e, 0x402107d2, 0x40210919]
+offset = 0
+len = 4
+mark = "D"

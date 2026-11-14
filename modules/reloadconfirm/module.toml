@@ -1,0 +1,54 @@
+[module]
+id = "em/reloadconfirm"
+version = "0.1.0"
+name = "Reload confirm"
+category = "ui"
+type = "raw"
+author = "em"
+status = "experimental"
+summary = "SETTINGS > PERSONALIZE > RELOAD CONFIRM (spento di base): acceso, FUNC + NO chiede conferma prima di ricaricare il pattern (porting di reloadconfirm di dn2_firmware_explore). Solo Digitone II 1.11."
+ports = ["dn2-1.12"]
+requires = []
+conflicts = []
+
+[targets]
+"dn2-1.12" = "experimental"
+
+[[object]]
+path = "build/reload.dko.json"
+sources = ["src/cf/reload.s"]
+place = "cf.expansion"
+
+# 0x4005f1a2: move.l 160(%a2),-(%sp) ; jsr 0x400f6df8 (10 B), FUNC + NO premuto: jmp key_hook (le riesegue lui)
+[[op]]
+op = "hook"
+hook = "em.rlc.tasto.hook"
+to = "key_hook"
+[[op]]
+op = "hook"
+hook = "em.rlc.menu.hook"
+to = "menu_hook"
+[[claim]]
+resource = "em.rlc.tasto"
+[[claim]]
+resource = "em.rlc.menu"
+
+[[anchor_rule]]
+name = "em.rlc.tasto"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x6700fdb2, 0x2f2a00a0, 0x4eb9400f]
+offset = 4
+len = 10
+mark = "D"
+
+[[anchor_rule]]
+name = "em.rlc.menu"
+cpu = "cf"
+kind = "cf_words"
+as = "code"
+words = [0x4cef7c7c, 0x00184fef, 0x00804e75, 0x4feffff4]
+offset = 0
+len = 6
+mark = "D"
