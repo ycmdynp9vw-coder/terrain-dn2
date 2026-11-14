@@ -79,6 +79,7 @@
   body.drag, body.drag * { user-select: none !important; -webkit-user-select: none !important; cursor: ns-resize; }
   a.go { font: 600 14px var(--mono); font-style: normal; white-space: nowrap; }
   .play .screen { cursor: crosshair; }
+  .play .screen canvas { touch-action: none; }
   .knobs { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px 6px; margin-top: 14px; user-select: none; }
   .knob { text-align: center; cursor: ns-resize; touch-action: none; padding: 4px 0; }
   .knob .dial { width: 34px; height: 34px; margin: 0 auto; border-radius: 50%; border: 1.5px solid var(--ink); position: relative; background: #fbf9f4; }
@@ -93,6 +94,16 @@
   .kbd .on { background: var(--blue) !important; }
   .kbd .oct { position: absolute; right: 0; bottom: -20px; font: 11px var(--mono); color: var(--mute); }
   @media (max-width: 620px) {
+    main { padding: 18px 16px 60px; }
+    .top { flex-wrap: wrap; font-size: 12px; }
+    header { padding-top: 32px; }
+    .sub { font-size: 19px; }
+    .screen { padding: 10px; }
+    .knob .dial { width: 40px; height: 40px; }
+    .knob .dial i { height: 13px; transform-origin: 50% 17px; }
+    .kbd { height: 84px; } .kbd .w { height: 84px; } .kbd .b { height: 50px; }
+    figcaption { flex-wrap: wrap; }
+    h2 { margin-top: 46px; }
     .knobs { grid-template-columns: repeat(4, 1fr); }
     body { font-size: 17px; }
     dl.feat div { grid-template-columns: 1fr; gap: 2px; }
@@ -112,7 +123,7 @@
   </header>
 
   <figure>
-    <div class="screen"><canvas id="hero" width="128" height="64" class="px"></canvas></div>
+    <div class="screen"><canvas id="hero" width="108" height="54" class="px"></canvas></div>
     <figcaption style="display:flex;justify-content:space-between;gap:12px"><span><b>FIG. 1</b> &nbsp;Page 1 of TERRAIN, as the Digitone draws it.</span><a class="go" href="#test">test it here! ↓</a></figcaption>
   </figure>
 
@@ -133,7 +144,7 @@
 
   <h2 id="test"><span>02</span>Test it</h2>
   <div class="play">
-    <div class="screen"><canvas id="scr" width="128" height="64" class="px"></canvas></div>
+    <div class="screen"><canvas id="scr" width="108" height="54" class="px"></canvas></div>
     <div class="knobs" id="knobs"></div>
     <div class="kbd" id="kbd"></div>
   </div>
@@ -304,7 +315,7 @@ async function playable() {
   function draw() {
     T.render(G, T.words(vals));
     for (let i = 0; i < G.length; i++) { const o = i * 4, v = G[i] ? 236 : 0; img.data[o] = v; img.data[o + 1] = v; img.data[o + 2] = G[i] ? 230 : 0; img.data[o + 3] = 255; }
-    x.putImageData(img, 0, 0);
+    x.putImageData(img, -16, -10);
     if (node) node.port.postMessage({ k: T.voiceParams(T.words(vals)) });
   }
   let pending = false; const redraw = () => { if (!pending) { pending = true; requestAnimationFrame(() => { pending = false; draw(); }); } };
@@ -326,7 +337,7 @@ async function playable() {
   function show(k) { const el = ui[k.id], f = (vals[k.id] - k.min) / (k.max - k.min); el.querySelector("i").style.transform = `rotate(${-135 + 270 * f}deg)`; el.querySelector(".v").textContent = T.shown(k, vals[k.id]); }
   T.KNOBS.forEach(show);
   // the map: drag the cursor
-  const fromEvent = (e) => { const r = c.getBoundingClientRect(); return [((e.clientX - r.left) / r.width) * 128, ((e.clientY - r.top) / r.height) * 64]; };
+  const fromEvent = (e) => { const r = c.getBoundingClientRect(); return [16 + ((e.clientX - r.left) / r.width) * 108, 10 + ((e.clientY - r.top) / r.height) * 54]; };
   c.addEventListener("pointerdown", (e) => { e.preventDefault(); getSelection().removeAllRanges(); c.setPointerCapture(e.pointerId); move(e); });
   c.addEventListener("pointermove", (e) => { if (c.hasPointerCapture(e.pointerId)) move(e); });
   function move(e) { const [px, py] = fromEvent(e); if (py > 32) return; const [wx, wy] = T.posFromPixel(px, py); vals.posx = wx; vals.posy = wy; show(T.KNOBS[4]); show(T.KNOBS[5]); redraw(); }
@@ -384,7 +395,7 @@ async function hero() {
     vals.mod = Math.round(((Math.sin(t / 700) + 1) / 2) * 0x2800);
     T.render(G, T.words(vals));
     for (let i = 0; i < G.length; i++) { const o = i * 4, v = G[i] ? 236 : 0; img.data[o] = v; img.data[o + 1] = v; img.data[o + 2] = G[i] ? 230 : 0; img.data[o + 3] = 255; }
-    x.putImageData(img, 0, 0);
+    x.putImageData(img, -16, -10);
     if (!still) setTimeout(() => requestAnimationFrame(frame), 50);
   }
   frame();
