@@ -20,7 +20,7 @@ leaves your computer. This repository contains **no Elektron firmware**.
   key tracking. Five pages with native-looking graphics; press an encoder to see its value.
 - **SETTINGS › PERSONALIZE**
   - **NEGATIVE SCREEN**: inverted display.
-  - **MOD GRAPHICS**: TERRAIN graphics glide to the new value on knob turns, randomise and FUNC + turn.
+  - **MOD GRAPHICS**: graphics glide to the new value on knob turns, randomise and FUNC + turn: TERRAIN's pages and the SYN pages of the stock machines.
 - Mods ported from [dn2_firmware_explore](https://github.com/angellinares/dn2_firmware_explore):
   more LFO destinations (FX and voice parameters), LFO ONE/HALF that hold their value, arpeggiator on
   MIDI tracks, SHUF and RAND arp modes, arp offsets in scale, MIDI out of audio tracks, reload confirm.

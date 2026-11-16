@@ -120,7 +120,7 @@
 <body>
 <canvas id="hexbg" aria-hidden="true"></canvas>
 <main>
-  <div class="top"><span>blskk &nbsp;/&nbsp; terrain</span><span><a href="https://www.instagram.com/emablskk/">instagram</a> &nbsp;·&nbsp; <a id="srcTop" href="#">source</a> &nbsp;·&nbsp; <span id="ver">v63c</span></span></div>
+  <div class="top"><span>blskk &nbsp;/&nbsp; terrain</span><span><a href="https://www.instagram.com/emablskk/">instagram</a> &nbsp;·&nbsp; <a id="srcTop" href="#">source</a> &nbsp;·&nbsp; <span id="ver">v63e</span></span></div>
 
   <header>
     <canvas id="mark" aria-label="TERRAIN"></canvas>
@@ -138,7 +138,7 @@
     <div><dt>TERRAIN</dt><dd>Wave terrain synthesis. A point runs over a surface and the height under it is the sound. 64 terrains in 8 banks, with warp, FM-style mod, phase distortion, a drum page and sync. It sits right under SWARMER in the machine list.</dd></div>
     <div><dt>Pages</dt><dd>Five of them, made to look like the stock ones. Push an encoder to see its value.</dd></div>
     <div><dt>Negative screen</dt><dd>Flips the whole screen. It's in SETTINGS › PERSONALIZE. P-locks still show the right way round.</dd></div>
-    <div><dt>Mod graphics</dt><dd>Also in PERSONALIZE. TERRAIN's drawings slide to the new value instead of jumping.</dd></div>
+    <div><dt>Mod graphics</dt><dd>Also in PERSONALIZE. The drawings slide to the new value instead of jumping: TERRAIN, and the SYN pages of FM TONE, FM DRUM, WAVETONE and SWARMER too.</dd></div>
     <div><dt>Boot</dt><dd>Three intros that take turns every time you switch on: GLITCH, RITO, FOURIER.</dd></div>
     <div><dt>From dnfw</dt><dd>The mods I wanted from <a href="https://github.com/angellinares/dn2_firmware_explore">dn2_firmware_explore</a>: more LFO destinations, LFO ONE/HALF that hold, arp on MIDI tracks, SHUF and RAND arp modes, arp offsets in scale, MIDI out from audio tracks, reload confirm.</dd></div>
   </dl>
@@ -235,6 +235,7 @@
 
   <h2><span>07</span>Changes</h2>
   <ul class="log">
+    <li><span>v63e</span><div>Mod graphics on the stock machines' SYN pages too.</div></li>
     <li><span>v63c</span><div>FUNC + turn moves TERRAIN's parameters.</div></li>
     <li><span>v63b</span><div>The three intros take turns; the cursor stays on at the end of GLITCH.</div></li>
     <li><span>v63a</span><div>First public build. Fonts are read from your own firmware.</div></li>
@@ -251,7 +252,7 @@
 import { buildFirmware } from "./js/costruisci.js";
 import * as T from "./js/terrain-play.js";
 import * as Demos from "./js/param-demos.js";
-const PATCH = "patch/patch-v63c.json", OUT = "TERRAIN-dn2-1.12-v63c.syx";
+const PATCH = "patch/patch-v63e.json", OUT = "TERRAIN-dn2-1.12-v63e.syx";
 const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $ = (id) => document.getElementById(id);
 const loadImg = (src) => new Promise((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = ko; i.src = src; });

@@ -53,7 +53,7 @@ static int machine_type(void *view)
     return (int)(signed char)kit[SOUND_BASE + SOUND_TYPE + SOUND_STRIDE * TRACK_OF(view)];
 }
 
-volatile u32 em_dbg[8] = {0x454D4442, 0, 0, 0, 0, 0, 0, 0};   /* [6] chiamate di em_poll, [7] ridisegni chiesti da em_poll */   /* 'EMDB', chiamate, tipo letto, motore (0..3, 4 = di serie), pagina, rifatte */
+volatile u32 em_dbg[12] = {0x454D4442, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};   /* v63e: [8] disegni SYN di serie, [9] con scambio, [10] valori scambiati, [11] ripristini saltati */   /* [6] chiamate di em_poll, [7] ridisegni chiesti da em_poll */   /* 'EMDB', chiamate, tipo letto, motore (0..3, 4 = di serie), pagina, rifatte */
 
 static int last_e = -1, last_page = -1, last_w[40];
 
@@ -230,4 +230,61 @@ int em_syn_turn(void *view, void *ev)
         return r;
     }
     return STOCK_TURN(view, ev);
+}
+
+/* ---- v63e (15/11): MOD GRAPHICS sulle macchine di serie. Il disegno della pagina SYN (vtable +8, 0x40018118) passa da qui. Le
+ * pagine di serie disegnano leggendo il suono della traccia (kit + 52 + 1163*traccia + 20 + 2*slot, provato nell'emulatore: un CC
+ * cambia un byte, rimesso a mano lo schermo torna com'era). Con MOD GRAPHICS acceso, per il solo tempo del disegno di serie, negli
+ * slot 25..64 che stanno scivolando si scrive il valore disegnato, poi si rimette quello vero (solo se nessuno l'ha cambiato nel
+ * frattempo). I nostri motori scivolano gia' in em_syn: per loro niente scambio. */
+#define STOCK_SYN_DRAW ((void (*)(void *, void *))0x40018118u)
+#define SW_LO 25
+#define SW_N  40
+static int sw_t = -2, sw_tr = -1, sw_pg = -1;
+static unsigned short sw_disp[SW_N];
+static u32 sw_glide_t;
+
+static unsigned rd16(volatile u8 *p) { return ((unsigned)p[0] << 8) | p[1]; }
+static void wr16(volatile u8 *p, unsigned v) { p[0] = (u8)(v >> 8); p[1] = (u8)v; }
+
+void em_syn_draw(void *view, void *canvas)
+{
+    u8 *kit = KIT_POINTER;
+    int t = machine_type(view), ours = 0;
+    for (int e = 0; e < E_N; e++) if (t == (int)(u32)MOT[e].type) ours = 1;
+    em_dbg[8]++;
+    if (ours || !kit) { sw_t = -2; STOCK_SYN_DRAW(view, canvas); return; }
+
+    int tr = TRACK_OF(view), pg = ((int (*)(void *))method(view, 132))(view);
+    volatile u8 *s = kit + SOUND_BASE + SOUND_STRIDE * tr + 20 + 2 * SW_LO;
+    u32 now = TICK;
+    /* spento: lo stato si aggiorna lo stesso (disegnato = vero), cosi' accendendolo il primo cambio scivola gia' */
+    int nuovo = t != sw_t || tr != sw_tr || pg != sw_pg || MODVIS != 1, moving = 0;
+    int steps = (int)(now - sw_glide_t) / 4;
+    if (steps > 0) sw_glide_t += (u32)steps * 4u;
+    if (steps > 8) steps = 8;
+    if (nuovo) sw_glide_t = now;
+    unsigned real[SW_N];
+    for (int i = 0; i < SW_N; i++) {
+        real[i] = rd16(s + 2 * i);
+        int d = (int)real[i] - (int)sw_disp[i];
+        if (nuovo) d = 0, sw_disp[i] = (unsigned short)real[i];
+        for (int k = 0; k < steps && d; k++) {
+            int st = (d < 128 && d > -128) ? d : d / 4;
+            sw_disp[i] = (unsigned short)(sw_disp[i] + st);
+            d -= st;
+        }
+        if (d) { moving = 1; wr16(s + 2 * i, sw_disp[i]); em_dbg[10]++; }
+    }
+    if (moving) em_dbg[9]++;
+    STOCK_SYN_DRAW(view, canvas);
+    if (moving)
+        for (int i = 0; i < SW_N; i++)
+            if (sw_disp[i] != real[i]) {
+                if (rd16(s + 2 * i) == sw_disp[i]) wr16(s + 2 * i, real[i]);
+                else em_dbg[11]++;                       /* cambiato durante il disegno: resta il valore nuovo */
+            }
+    sw_t = t; sw_tr = tr; sw_pg = pg;
+    em_wat = now; em_view = view;
+    if (moving) want_redraw(now + MOD_MS);
 }

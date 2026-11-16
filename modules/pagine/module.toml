@@ -1,6 +1,6 @@
 [module]
 id = "em/pagine"
-version = "3.14.1"
+version = "3.15.0"
 name = "Pagine dei motori"
 category = "machines"
 type = "raw"
@@ -106,6 +106,15 @@ width = 4
 
 [[claim]]
 resource = "em.syn.turn"
+
+# v63e (15/11): il disegno della pagina SYN (vtable +8, 0x40018118) passa da em_syn_draw: MOD GRAPHICS sulle macchine di serie.
+[[op]]
+op = "write"
+cpu = "cf"
+anchor = "em.syn.vtable"
+offset = 8
+value = "em_syn_draw"
+width = 4
 
 [[anchor_rule]]
 name = "em.syn.turn"
